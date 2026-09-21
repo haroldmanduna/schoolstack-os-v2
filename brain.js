@@ -23,7 +23,66 @@ function saveLocalBrain(data) {
   } catch {}
 }
 
-// Second Brain: persistent memory + reasoning
+// ===== INTERNET BROWSING ABILITY =====
+export async function searchInternet(query, count = 5) {
+  try {
+    // Use DuckDuckGo HTML search (no API key needed)
+    const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+    const html = await res.text();
+    // Simple parse: extract result links and snippets
+    const results = [];
+    const regex = /<a class="result__url" href="([^"]+)".*?>(.*?)<\/a>[\s\S]*?<a class="result__snippet"[^>]*>(.*?)<\/a>/gi;
+    let match;
+    while ((match = regex.exec(html)) !== null && results.length < count) {
+      results.push({
+        url: match[1],
+        title: match[2].replace(/<[^>]+>/g, '').trim(),
+        snippet: match[3].replace(/<[^>]+>/g, '').trim()
+      });
+    }
+    // Fallback: try to extract any links
+    if (results.length === 0) {
+      const linkRegex = /<a[^>]+href="(https?:\/\/[^"]+)"[^>]*>([^<]{10,100})<\/a>/gi;
+      while ((match = linkRegex.exec(html)) !== null && results.length < count) {
+        if (!match[1].includes('duckduckgo.com')) {
+          results.push({ url: match[1], title: match[2].trim(), snippet: '' });
+        }
+      }
+    }
+    return results;
+  } catch (e) {
+    console.error('Search failed:', e.message);
+    return [{ url: '', title: 'Search failed, using fallback', snippet: e.message }];
+  }
+}
+
+export async function fetchPage(url) {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'text/html,application/xhtml+xml'
+      },
+      redirect: 'follow'
+    });
+    const html = await res.text();
+    // Strip HTML to text (simple)
+    let text = html.replace(/<script[\s\S]*?<\/script>/gi, '')
+                   .replace(/<style[\s\S]*?<\/style>/gi, '')
+                   .replace(/<[^>]+>/g, ' ')
+                   .replace(/\s+/g, ' ')
+                   .trim()
+                   .slice(0, 8000);
+    return { url, content: text, length: text.length, status: res.status };
+  } catch (e) {
+    return { url, content: `Fetch failed: ${e.message}`, error: true };
+  }
+}
 
 export async function addMemory({ project_id = null, agent_name, memory_type, title, content, metadata = {} }) {
   let embedding = null;
@@ -46,7 +105,6 @@ export async function addMemory({ project_id = null, agent_name, memory_type, ti
     console.log('Supabase unavailable, local fallback:', e.message);
   }
 
-  // Local fallback - persistent
   const brain = loadLocalBrain();
   const mem = { id: 'local-' + Date.now(), ...payload, created_at: new Date().toISOString() };
   brain.memories.unshift(mem);
@@ -63,7 +121,6 @@ export async function searchMemories({ query, agent_name = null, project_id = nu
     const { data, error } = await q;
     if (!error && data && data.length > 0) return data;
   } catch {}
-  // Local fallback
   const brain = loadLocalBrain();
   let mems = brain.memories;
   if (agent_name) mems = mems.filter(m => m.agent_name === agent_name);
@@ -86,34 +143,58 @@ export async function getProjectMemories(slug) {
   return brain.memories.filter(m => !m.project_id || m.metadata?.project_slug === slug).slice(0, 50);
 }
 
-export async function queryBrain({ question, context = '', project_slug = null }) {
+export async function queryBrain({ question, context = '', project_slug = null, browse = true }) {
   if (!OPENROUTER_KEY) {
     return { answer: 'Second brain online but OpenRouter key missing. Using local memory only.', source: 'fallback' };
   }
 
-  // Gather relevant memories for context
+  // Gather relevant memories for context (PERSISTENT MEMORY)
   let memories = [];
   if (project_slug) {
     memories = await getProjectMemories(project_slug);
   } else {
-    memories = await searchMemories({ query: question, limit: 5 });
+    memories = await searchMemories({ query: question, limit: 8 });
   }
 
-  const memoryContext = memories.map(m => `[${m.agent_name}:${m.memory_type}] ${m.title}: ${m.content}`).join('\n').slice(0, 4000);
+  // BROWSE INTERNET if requested
+  let webResults = [];
+  let webContext = '';
+  if (browse) {
+    try {
+      webResults = await searchInternet(question, 5);
+      webContext = webResults.map(r => `[WEB] ${r.title} (${r.url}): ${r.snippet}`).join('\n').slice(0, 3000);
+      // If question is about a school, fetch its page if found
+      if (webResults.length > 0 && webResults[0].url) {
+        const page = await fetchPage(webResults[0].url);
+        if (!page.error) {
+          webContext += `\n\nFetched ${page.url} content: ${page.content.slice(0, 2000)}`;
+        }
+      }
+    } catch (e) {
+      webContext = `Web search failed: ${e.message}`;
+    }
+  }
 
-  const systemPrompt = `You are SchoolStack Second Brain — persistent memory for 13 specialist agents building school websites/portals in Bulawayo.
-You have access to:
-- Project memories
-- Beacon leads (Bulawayo schools)
-- Decision logs
-- Agent expertise
+  const memoryContext = memories.map(m => `[MEMORY:${m.agent_name}:${m.memory_type}] ${m.title}: ${m.content}`).join('\n').slice(0, 4000);
 
-Be concise, actionable, and precise. No hallucinations — cite memory if used.
+  const systemPrompt = `You are SchoolStack Second Brain — REAL builder with persistent memory + internet browsing for 13 specialist agents building school websites/portals in Bulawayo.
 
-Context memories:
+You have:
+- PERSISTENT MEMORY from Supabase (past decisions, learnings, errors, fixes)
+- LIVE INTERNET BROWSING results
+- You are NOT giving instructions — you BUILD real websites/portals
+
+Be concise, actionable, and precise. Cite memories and web results.
+
+PERSISTENT MEMORIES:
 ${memoryContext}
 
+LIVE WEB RESULTS:
+${webContext}
+
 Additional context: ${context}
+
+If user asks to build website/portal, explain you will actually build it via /api/build endpoints, not just instructions.
 `;
 
   try {
@@ -131,29 +212,28 @@ Additional context: ${context}
           { role: 'system', content: systemPrompt },
           { role: 'user', content: question }
         ],
-        max_tokens: 800
+        max_tokens: 1000
       })
     });
 
     const json = await res.json();
     if (json.error) {
-      console.error('OpenRouter error:', json.error);
-      return { answer: `Brain error: ${json.error.message}. Memories found: ${memories.length}`, memories };
+      return { answer: `Brain error: ${json.error.message}. Memories: ${memories.length}, Web: ${webResults.length}`, memories, webResults };
     }
     const answer = json.choices?.[0]?.message?.content || 'No answer';
-    // Store this Q&A as memory
+    
+    // Store this Q&A as persistent memory (LEARNING)
     await addMemory({
       agent_name: 'nexus',
       memory_type: 'learning',
       title: `Q: ${question.slice(0, 80)}`,
-      content: `Q: ${question}\nA: ${answer}`,
-      metadata: { project_slug }
+      content: `Q: ${question}\nA: ${answer}\nWeb: ${webResults.length} results`,
+      metadata: { project_slug, webResults: webResults.length }
     });
 
-    return { answer, memories, source: 'openrouter' };
+    return { answer, memories, webResults, source: 'openrouter+web' };
   } catch (e) {
-    console.error('Brain query failed:', e.message);
-    return { answer: `Brain offline: ${e.message}. Found ${memories.length} memories locally.`, memories, source: 'fallback' };
+    return { answer: `Brain offline: ${e.message}. Found ${memories.length} memories, ${webResults.length} web results.`, memories, webResults, source: 'fallback' };
   }
 }
 

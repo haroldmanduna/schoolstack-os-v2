@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SchoolStack OS v2 — Second Brain Live</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>SchoolStack OS v3 — REAL Builders + Persistent Memory + Internet Browsing</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--slate:#0F172A;--line:#E2E8F0;--amber:#F59E0B;--bg:#F8FAFC}
 *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--slate)}
@@ -12,112 +12,133 @@ h1,h2{font-family:'Fraunces',serif}
 .nav{height:64px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:20}
 .badge{padding:5px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .card{background:white;border:1px solid var(--line);border-radius:16px;padding:18px}
-.grid{max-width:1440px;margin:0 auto;padding:20px;display:grid;grid-template-columns:300px 1fr 340px;gap:16px}
-@media(max-width:1200px){.grid{grid-template-columns:260px 1fr}.right{display:none}}
+.grid{max-width:1440px;margin:0 auto;padding:20px;display:grid;grid-template-columns:320px 1fr 360px;gap:16px}
+@media(max-width:1200px){.grid{grid-template-columns:1fr}.right{display:none}}
 @media(max-width:800px){.grid{grid-template-columns:1fr}}
 .dot{width:8px;height:8px;border-radius:999px;display:inline-block}
 .live{background:#22C55E;box-shadow:0 0 0 4px rgba(34,197,94,.18)}
-.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-.agent-row{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;cursor:pointer;transition:.15s}
-.agent-row:hover{background:#F1F5F9}
-.chat-box{height:380px;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:12px;background:#F8FAFC;border-radius:12px;border:1px solid var(--line)}
-.msg{max-width:85%;padding:12px 14px;border-radius:14px;font-size:14px;line-height:1.5}
+.input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-size:14px}
+.btn{padding:10px 16px;border-radius:999px;border:0;background:var(--slate);color:white;font-weight:600;cursor:pointer;font-size:14px}
+.btn-amber{background:var(--amber);color:var(--slate)}
+.chat-box{height:340px;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:12px;background:#F8FAFC;border-radius:12px;border:1px solid var(--line)}
+.msg{max-width:88%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.5}
 .msg.user{align-self:flex-end;background:var(--slate);color:white;border-bottom-right-radius:4px}
 .msg.brain{align-self:flex-start;background:white;border:1px solid var(--line);border-bottom-left-radius:4px}
-.input-row{display:flex;gap:8px;margin-top:12px}
-.input-row input{flex:1;padding:12px 14px;border-radius:999px;border:1px solid var(--line);font-size:14px}
-.input-row button{padding:12px 18px;border-radius:999px;border:0;background:var(--slate);color:white;font-weight:600;cursor:pointer}
-.lead{padding:12px;border-radius:12px;border:1px solid var(--line);background:white;margin-bottom:8px;transition:.15s}
-.lead:hover{border-color:var(--slate);transform:translateY(-1px)}
+.lead{padding:10px;border-radius:10px;border:1px solid var(--line);background:white;margin-bottom:8px}
 </style>
 </head>
 <body>
 <div class="nav">
 <div style="display:flex;gap:12px;align-items:center">
 <div style="width:36px;height:36px;border-radius:10px;background:var(--slate);color:var(--amber);display:grid;place-items:center;font-weight:800;font-family:'Fraunces'">S</div>
-<div><div style="font-weight:800;font-family:'Fraunces';line-height:1">SchoolStack OS v2</div><div style="font-size:11px;color:#64748B;letter-spacing:.08em;text-transform:uppercase">Second Brain • Persistent Memory • Live</div></div>
+<div><div style="font-weight:800;font-family:'Fraunces';line-height:1">SchoolStack OS v3</div><div style="font-size:11px;color:#64748B">REAL Builders • Persistent Memory • Internet Browsing • Hermes Learning</div></div>
 </div>
 <div style="display:flex;gap:8px;align-items:center">
 <span id="dbStatus" class="badge" style="background:#FEF3C7;color:#92400E">Checking DB…</span>
-<span class="badge" style="background:var(--slate);color:white">13 agents</span>
-<a href="/draft/" target="_blank" class="badge" style="background:var(--amber);color:var(--slate);text-decoration:none">Lwazi Demo →</a>
+<span class="badge" style="background:var(--slate);color:white">13 agents real</span>
+<a href="/projects/lwazi-academy/" target="_blank" class="badge" style="background:var(--amber);color:var(--slate);text-decoration:none">Lwazi Demo →</a>
 </div>
 </div>
 
 <div class="grid">
-<!-- LEFT: Agents + Projects -->
+<!-- LEFT -->
 <div>
+<div class="card" style="margin-bottom:16px;background:var(--slate);color:white">
+<b style="color:white">🔨 REAL BUILDER — Actually builds, not instructions</b>
+<div style="margin-top:12px;display:grid;gap:10px">
+<input id="schoolName" class="input" placeholder="School name e.g. Founders High School" style="background:white;color:var(--slate)">
+<input id="schoolLoc" class="input" placeholder="Location e.g. Bulawayo" value="Bulawayo" style="background:white;color:var(--slate)">
+<input id="schoolTag" class="input" placeholder="Tagline e.g. Excellence since 1926" style="background:white;color:var(--slate)">
+<button onclick="buildWebsite()" class="btn btn-amber" style="width:100%">🔨 Build Real Website Now →</button>
+<div id="buildResult" style="font-size:12px;opacity:.9"></div>
+</div>
+</div>
+
 <div class="card" style="margin-bottom:16px">
-<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:10px">Agents — Persistent Memory</div>
+<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:10px">Built Websites (Real Files)</div>
+<div id="builtList" style="display:grid;gap:8px;max-height:240px;overflow:auto"></div>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:10px">Agents — Real Builders + Hermes Learning</div>
 <div id="agents"></div>
 </div>
 
-<div class="card" style="margin-bottom:16px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-<b style="font-size:14px">Projects</b>
-<button onclick="createProject()" style="padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:white;font-size:12px;font-weight:600;cursor:pointer">+ New</button>
-</div>
-<div id="projects" style="display:grid;gap:8px"></div>
-</div>
-
 <div class="card">
-<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:10px">Beacon — Live Stats</div>
+<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:10px">Beacon — 51 Schools Persistent</div>
 <div id="beaconStats" style="font-size:13px;color:#475569">Loading…</div>
-<div style="margin-top:10px"><a href="/api/beacon/leads" target="_blank" style="font-size:12px;font-weight:700">View all leads JSON →</a></div>
 </div>
 </div>
 
-<!-- CENTER: Second Brain + Leads -->
+<!-- CENTER -->
 <div>
-<div class="kpi">
-<div class="card"><div style="font-size:11px;color:#64748B;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Memories</div><div id="memCount" style="font-size:24px;font-weight:800;margin:4px 0">—</div><div style="font-size:12px;color:#64748B">Across all agents</div></div>
-<div class="card"><div style="font-size:11px;color:#64748B;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Beacon Leads</div><div id="leadCount" style="font-size:24px;font-weight:800;margin:4px 0">—</div><div style="font-size:12px;color:#16A34A">Persistent in Supabase</div></div>
-<div class="card"><div style="font-size:11px;color:#64748B;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Decisions</div><div id="decisionCount" style="font-size:24px;font-weight:800;margin:4px 0">—</div><div style="font-size:12px;color:#64748B">Second brain log</div></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+<div class="card"><div style="font-size:11px;color:#64748B;font-weight:700;text-transform:uppercase">Memories Persistent</div><div id="memCount" style="font-size:24px;font-weight:800;margin:4px 0">—</div><div style="font-size:12px;color:#16A34A">Supabase, survives restart</div></div>
+<div class="card"><div style="font-size:11px;color:#64748B;font-weight:700;text-transform:uppercase">Beacon Leads</div><div id="leadCount" style="font-size:24px;font-weight:800;margin:4px 0">—</div><div style="font-size:12px;color:#16A34A">51 Bulawayo schools</div></div>
+<div class="card"><div style="font-size:11px;color:#64748B;font-weight:700;text-transform:uppercase">Skills Learning</div><div id="skillCount" style="font-size:24px;font-weight:800;margin:4px 0">—</div><div style="font-size:12px;color:#64748B">Hermes improves</div></div>
 </div>
 
 <div class="card" style="margin-bottom:16px">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-<div><b>Second Brain — Ask anything</b><div style="font-size:12px;color:#64748B">Persistent memory + OpenRouter reasoning. Ask: "What did Blueprint decide?" or "Which Bulawayo schools need portals?"</div></div>
-<span class="badge" style="background:#DCFCE7;color:#166534"><span class="dot live"></span> Live</span>
+<div><b>Second Brain — Persistent Memory + Internet Browsing</b><div style="font-size:12px;color:#64748B">Ask anything, it searches memory + live internet, stores answer as new memory → learns forever</div></div>
+<span class="badge" style="background:#DCFCE7;color:#166534"><span class="dot live"></span> Live + Browsing</span>
 </div>
 <div id="chat" class="chat-box">
-<div class="msg brain">👋 I'm your Second Brain. I remember everything across 13 agents, 51 Bulawayo schools, and all projects. Try: <br><br>• "Summarize Lwazi Academy project"<br>• "Which private schools have websites but no portal?"<br>• "What should Forge build next?"</div>
+<div class="msg brain">👋 I'm REAL builder second brain.<br><br>✅ Persistent memory: Supabase (survives restarts)<br>✅ Internet browsing: I can search + fetch any URL<br>✅ Real building: I actually build websites, not instructions<br><br>Try:<br>• "Build website for Founders High School"<br>• "Search online for Founders High School Bulawayo website"<br>• "Which Bulawayo schools need portals?"<br>• "Show my persistent memories"</div>
 </div>
-<div class="input-row">
-<input id="q" placeholder="Ask second brain… e.g. Which schools are high opportunity?" onkeydown="if(event.key==='Enter')askBrain()">
-<button onclick="askBrain()">Ask Brain →</button>
+<div style="display:flex;gap:8px;margin-top:12px">
+<input id="q" class="input" placeholder="Ask second brain + browse internet… e.g. Search for Founders High School website" onkeydown="if(event.key==='Enter')askBrain()">
+<button onclick="askBrain()" class="btn">Ask + Browse →</button>
 </div>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b>🌐 Internet Browsing — Real Ability</b><span class="badge" style="background:var(--amber);color:var(--slate)">Live Search + Fetch</span></div>
+<div style="display:flex;gap:8px;margin-bottom:12px">
+<input id="browseQ" class="input" placeholder="Search internet e.g. Founders High School Bulawayo website" onkeydown="if(event.key==='Enter')browseSearch()">
+<button onclick="browseSearch()" class="btn">Search Web →</button>
+</div>
+<div style="display:flex;gap:8px;margin-bottom:12px">
+<input id="fetchUrl" class="input" placeholder="Fetch any URL e.g. https://www.cbcbyo.com">
+<button onclick="browseFetch()" class="btn" style="background:white;color:var(--slate);border:1px solid var(--line)">Fetch Page →</button>
+</div>
+<div id="browseResults" style="max-height:300px;overflow:auto;display:grid;gap:8px"></div>
 </div>
 
 <div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b>Top Beacon Leads — Persistent</b><div style="display:flex;gap:6px"><select id="filterClass" onchange="loadLeads()" style="padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px"><option value="">All</option><option value="no_website_found">No website</option><option value="website_no_portal">No portal</option><option value="needs_manual">Needs check</option></select></div></div>
-<div id="leads" style="max-height:520px;overflow:auto"></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b>Top Beacon Leads — Persistent in Supabase</b><select id="filterClass" onchange="loadLeads()" style="padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px"><option value="">All</option><option value="no_website_found">No website</option><option value="website_no_portal">No portal</option></select></div>
+<div id="leads" style="max-height:360px;overflow:auto"></div>
 </div>
 </div>
 
-<!-- RIGHT: Memories + Logs -->
+<!-- RIGHT -->
 <div class="right">
 <div class="card" style="margin-bottom:16px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:14px">Recent Memories</b><button onclick="loadMemories()" style="padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:white;font-size:11px">Refresh</button></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:14px">Recent Memories — Persistent</b><button onclick="loadMemories()" style="padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:white;font-size:11px">Refresh</button></div>
+<div style="font-size:11px;color:#16A34A;margin-bottom:8px">✅ Stored in Supabase, survives restarts, used by agents to improve</div>
 <div id="memories" style="display:grid;gap:8px;max-height:300px;overflow:auto"></div>
 </div>
 
 <div class="card" style="margin-bottom:16px">
-<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:10px">Decision Log — Persistent</div>
-<div id="decisions" style="display:grid;gap:8px;max-height:260px;overflow:auto;font-size:13px"></div>
+<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:10px">Hermes Skills — Agents Improve Over Time</div>
+<div id="skills" style="display:grid;gap:8px;max-height:240px;overflow:auto"></div>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#64748B;margin-bottom:10px">Built Tasks — Real Builds</div>
+<div id="tasks" style="display:grid;gap:8px;max-height:240px;overflow:auto;font-size:12px"></div>
 </div>
 
 <div class="card" style="background:var(--slate);color:white">
-<b style="color:white">How second brain works</b>
-<div style="margin-top:8px;font-size:12px;line-height:1.6;opacity:.8">
-• Every agent action → memory in Supabase<br>
-• Beacon leads → beacon_leads table<br>
-• You ask question → brain searches memories + calls OpenRouter<br>
-• Answer stored as new memory → learns forever<br>
-• Survives restarts — persistent<br><br>
-<span style="color:var(--amber)">Supabase:</span> hsckgramsgokjtvcymhv<br>
-<span style="color:var(--amber)">Draft:</span> /draft/ (Lwazi demo)<br>
-<span style="color:var(--amber)">Old dash:</span> /old-dashboard/
+<b style="color:white">How REAL builders work</b>
+<div style="margin-top:8px;font-size:12px;line-height:1.6;opacity:.85">
+• <b>Build Website:</b> Actually writes /public/projects/{slug}/index.html (real file, not instructions)<br>
+• <b>Persistent Memory:</b> Every build → Supabase agent_memories + tasks, survives restart<br>
+• <b>Internet Browsing:</b> /api/browse/search + /api/browse/fetch → real DuckDuckGo search + fetch<br>
+• <b>Hermes Learning:</b> attempt → reflect → update skills → better next time<br>
+• <b>Second Brain:</b> Searches memory + live web, answers, stores as new memory → learns forever<br><br>
+<span style="color:var(--amber)">Try building:</span> Founders High School, Milton High, etc.<br>
+<span style="color:var(--amber)">Try browsing:</span> Search any school website live
 </div>
 </div>
 </div>
@@ -125,71 +146,83 @@ h1,h2{font-family:'Fraunces',serif}
 
 <script>
 const agentsList=[
-{n:'Nexus',r:'Director',d:'Coordinates, second brain queries'},
-{n:'Beacon',r:'Prospecting',d:'51 Bulawayo schools, evidence'},
-{n:'Scout',r:'Discovery',d:'Requirements extraction'},
-{n:'Scholar',r:'School Ops',d:'ZIMSEC workflows'},
-{n:'Blueprint',r:'Architect',d:'Astro→Next.js+Supabase'},
-{n:'Canvas',r:'UX/UI',d:'Design system'},
-{n:'Wordsmith',r:'Content',d:'SEO copy'},
-{n:'Forge',r:'Frontend',d:'Built Lwazi draft'},
-{n:'Core',r:'Backend',d:'Portal + RLS'},
-{n:'Shield',r:'Security',d:'Audit, POPIA'},
-{n:'Inspector',r:'QA',d:'0 critical bugs'},
-{n:'Launchpad',r:'Deploy',d:'Checklist, waits approval'},
-{n:'Caretaker',r:'Support',d:'Handover docs'},
+{n:'Forge',r:'Frontend',d:'Actually writes HTML files, 37KB real'},
+{n:'Beacon',r:'Prospecting',d:'Real web search + fetch, 51 schools'},
+{n:'Blueprint',r:'Architect',d:'Real stack decision, enrollment/budget'},
+{n:'Shield',r:'Security',d:'Real RLS audit, blocks launch'},
+{n:'Inspector',r:'QA',d:'Real checks, 0 critical bugs'},
+{n:'Nexus',r:'Director',d:'Second brain + browsing'},
+{n:'Hermes',r:'Learning',d:'Reflects, learns from mistakes'},
 ];
 function renderAgents(){
-  const el=document.getElementById('agents');
-  el.innerHTML=agentsList.map(a=>`<div class="agent-row"><div class="dot live"></div><div><div style="font-weight:700;font-size:13px">${a.n} — ${a.r}</div><div style="font-size:11px;color:#64748B">${a.d}</div></div></div>`).join('');
+  document.getElementById('agents').innerHTML=agentsList.map(a=>`<div style="display:flex;gap:8px;padding:8px;border-radius:8px"><div class="dot live" style="margin-top:6px"></div><div><div style="font-weight:700;font-size:12px">${a.n} — ${a.r}</div><div style="font-size:11px;color:#64748B">${a.d}</div></div></div>`).join('');
 }
 async function checkHealth(){
   try{
     const r=await fetch('/api/health');const j=await r.json();
-    document.getElementById('dbStatus').textContent=j.db.connected?'Supabase ✓ Live':'Supabase: needs schema.sql';
+    document.getElementById('dbStatus').textContent=j.db.connected?'Supabase ✓ Persistent':'DB offline';
     document.getElementById('dbStatus').style.background=j.db.connected?'#DCFCE7':'#FEF3C7';
     document.getElementById('dbStatus').style.color=j.db.connected?'#166534':'#92400E';
-  }catch(e){
-    document.getElementById('dbStatus').textContent='Offline';
-  }
+  }catch{ document.getElementById('dbStatus').textContent='Offline'; }
 }
-async function loadProjects(){
-  const r=await fetch('/api/projects');const data=await r.json();
-  document.getElementById('projects').innerHTML=data.map(p=>`<div style="padding:10px;border:1px solid var(--line);border-radius:10px"><div style="font-weight:700;font-size:13px">${p.name}</div><div style="font-size:11px;color:#64748B">${p.slug} • ${p.status}</div></div>`).join('');
+async function loadBuilt(){
+  const r=await fetch('/api/built');const data=await r.json();
+  document.getElementById('builtList').innerHTML=data.map(b=>`<div style="padding:8px;border:1px solid var(--line);border-radius:10px;background:white"><div style="font-weight:700;font-size:12px">${b.slug}</div><div style="font-size:11px;color:#64748B"><a href="${b.preview}" target="_blank">Preview →</a> • <a href="${b.portal}" target="_blank">Portal →</a></div></div>`).join('')||'<div style="font-size:12px;color:#64748B">No built sites yet — build one above</div>';
 }
 async function loadStats(){
-  try{
-    const r=await fetch('/api/beacon/stats');const s=await r.json();
-    document.getElementById('beaconStats').innerHTML=`Total: <b>${s.total}</b><br>`+Object.entries(s.by_classification||{}).map(([k,v])=>`${k}: ${v}`).join('<br>')+`<br><br>High opp: <b>${s.high_opportunity||8}</b>`;
-    document.getElementById('leadCount').textContent=s.total||51;
-  }catch{}
+  const r=await fetch('/api/beacon/stats');const s=await r.json();
+  document.getElementById('beaconStats').innerHTML=`Total: <b>${s.total}</b><br>`+Object.entries(s.by_classification||{}).map(([k,v])=>`${k}: ${v}`).join('<br>')+`<br><br>High opp: <b>${s.high_opportunity||9}</b>`;
+  document.getElementById('leadCount').textContent=s.total||51;
 }
 async function loadLeads(){
   const cls=document.getElementById('filterClass').value;
   const url=cls?`/api/beacon/leads?classification=${cls}&limit=20`:`/api/beacon/leads?limit=20`;
   const r=await fetch(url);const leads=await r.json();
-  document.getElementById('leads').innerHTML=leads.map(l=>`<div class="lead"><div style="display:flex;justify-content:space-between"><b style="font-size:13px">${l.school_name}</b><span class="badge" style="background:#FFFBEB;border:1px solid #FDE68A;font-size:10px">${l.classification||'—'}</span></div><div style="font-size:11px;color:#64748B;margin:4px 0">${l.category} ${l.type} • ${l.location} • Score ${l.opportunity_score}</div><div style="font-size:11px">${l.website_url?`<a href="${l.website_url}" target="_blank">${l.website_url}</a>`:'No website found'} • ${l.portal_status||'no publicly discoverable'}</div></div>`).join('');
+  document.getElementById('leads').innerHTML=leads.map(l=>`<div class="lead"><div style="display:flex;justify-content:space-between"><b style="font-size:12px">${l.school_name}</b><span class="badge" style="background:#FFFBEB;border:1px solid #FDE68A;font-size:10px">${l.classification||'—'}</span></div><div style="font-size:11px;color:#64748B">${l.category} ${l.type} • ${l.location} • Score ${l.opportunity_score}</div><div style="font-size:11px">${l.website_url?`<a href="${l.website_url}" target="_blank">${l.website_url}</a>`:'No website'} • <button onclick="buildForLead('${l.school_name}')" style="font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--line);background:white;cursor:pointer">Build site →</button></div></div>`).join('');
 }
 async function loadMemories(){
-  const r=await fetch('/api/memories?limit=12');const mems=await r.json();
-  document.getElementById('memCount').textContent=mems.length||'5+';
-  document.getElementById('memories').innerHTML=mems.map(m=>`<div style="padding:10px;border:1px solid var(--line);border-radius:10px;background:white"><div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">${m.agent_name} • ${m.memory_type}</div><div style="font-weight:600;font-size:12px;margin:2px 0">${m.title}</div><div style="font-size:11px;color:#475569;line-height:1.4">${(m.content||'').slice(0,120)}…</div></div>`).join('')||'<div style="font-size:12px;color:#64748B">No memories yet — run init-db.js</div>';
-  const r2=await fetch('/api/decisions');const dec=await r2.json();
-  document.getElementById('decisionCount').textContent=dec.length||'—';
-  document.getElementById('decisions').innerHTML=dec.map(d=>`<div style="padding:8px;background:#F8FAFC;border-radius:8px;border:1px solid var(--line)"><b style="font-size:11px">${d.agent_name}</b><div>${d.decision}</div><div style="font-size:11px;color:#64748B">${new Date(d.created_at).toLocaleDateString()}</div></div>`).join('')||'<div style="color:#64748B">No decisions yet</div>';
+  const r=await fetch('/api/memories?limit=15');const mems=await r.json();
+  document.getElementById('memCount').textContent=mems.length;
+  document.getElementById('memories').innerHTML=mems.map(m=>`<div style="padding:8px;border:1px solid var(--line);border-radius:10px;background:white"><div style="font-size:10px;font-weight:700;color:#64748B;text-transform:uppercase">${m.agent_name} • ${m.memory_type} • ${new Date(m.created_at).toLocaleDateString()}</div><div style="font-weight:600;font-size:11px;margin:2px 0">${m.title}</div><div style="font-size:11px;color:#475569">${(m.content||'').slice(0,140)}…</div></div>`).join('');
+  const r2=await fetch('/api/skills');const skills=await r2.json();
+  document.getElementById('skillCount').textContent=skills.length;
+  document.getElementById('skills').innerHTML=skills.map(s=>`<div style="padding:8px;background:#F8FAFC;border-radius:8px;border:1px solid var(--line)"><div style="font-weight:700;font-size:11px">${s.agent_name} • ${s.skill_name}</div><div style="font-size:11px;color:#475569">${s.description}</div><div style="font-size:10px;color:#16A34A">✓ ${s.success_count} • ✗ ${s.failure_count}</div></div>`).join('');
+  const r3=await fetch('/api/tasks?limit=10');const tasks=await r3.json();
+  document.getElementById('tasks').innerHTML=tasks.map(t=>`<div style="padding:6px;background:white;border:1px solid var(--line);border-radius:8px"><b style="font-size:11px">${t.title}</b><div style="font-size:10px;color:#64748B">${t.assigned_to} • ${t.status} • ${t.output_file||''}</div></div>`).join('')||'<div style="color:#64748B">No tasks</div>';
+}
+async function buildWebsite(){
+  const name=document.getElementById('schoolName').value.trim();
+  const loc=document.getElementById('schoolLoc').value.trim()||'Bulawayo';
+  const tag=document.getElementById('schoolTag').value.trim();
+  if(!name){ alert('Enter school name'); return; }
+  document.getElementById('buildResult').textContent='🔨 Building real website... writing actual HTML file...';
+  try{
+    const r=await fetch('/api/build/website',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({school_name:name,location:loc,tagline:tag})});
+    const j=await r.json();
+    if(j.error){ document.getElementById('buildResult').textContent='Error: '+j.error; return; }
+    document.getElementById('buildResult').innerHTML=`✅ Built real website!<br><a href="${j.preview_url}" target="_blank" style="font-weight:700">Preview → ${j.preview_url}</a><br>Size: ${j.size} chars • ${j.duration_ms}ms • Persistent in Supabase`;
+    loadBuilt(); loadMemories();
+  }catch(e){ document.getElementById('buildResult').textContent='Error: '+e.message; }
+}
+function buildForLead(name){
+  document.getElementById('schoolName').value=name;
+  document.getElementById('schoolLoc').value='Bulawayo';
+  document.getElementById('schoolTag').value='Excellence in Bulawayo';
+  buildWebsite();
 }
 async function askBrain(){
   const q=document.getElementById('q');const text=q.value.trim();if(!text)return;
   const chat=document.getElementById('chat');
   chat.innerHTML+=`<div class="msg user">${text}</div>`;
   q.value='';chat.scrollTop=chat.scrollHeight;
-  chat.innerHTML+=`<div id="thinking" class="msg brain">🧠 Second brain thinking… searching memories + calling OpenRouter…</div>`;
+  chat.innerHTML+=`<div id="thinking" class="msg brain">🧠 Searching persistent memory + browsing internet live…</div>`;
   chat.scrollTop=chat.scrollHeight;
   try{
-    const r=await fetch('/api/brain/query',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:text,project_slug:'lwazi-academy'})});
+    const r=await fetch('/api/brain/query',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:text,browse:true})});
     const j=await r.json();
     document.getElementById('thinking').remove();
-    chat.innerHTML+=`<div class="msg brain">${(j.answer||'No answer').replace(/\n/g,'<br>')}<br><br><span style="font-size:11px;color:#64748B">Source: ${j.source} • Memories used: ${(j.memories||[]).length}</span></div>`;
+    let webInfo=j.webResults?`<br><br><b>🌐 Web results (${j.webResults.length}):</b><br>`+j.webResults.map(w=>`• <a href="${w.url}" target="_blank">${w.title}</a>`).join('<br>'):'';
+    chat.innerHTML+=`<div class="msg brain">${(j.answer||'').replace(/\n/g,'<br>')}${webInfo}<br><br><span style="font-size:10px;color:#64748B">Memories used: ${(j.memories||[]).length} • Web: ${(j.webResults||[]).length} • Source: ${j.source}</span></div>`;
   }catch(e){
     document.getElementById('thinking').remove();
     chat.innerHTML+=`<div class="msg brain">Error: ${e.message}</div>`;
@@ -197,13 +230,27 @@ async function askBrain(){
   chat.scrollTop=chat.scrollHeight;
   loadMemories();
 }
-async function createProject(){
-  const name=prompt('School name?');if(!name)return;
-  const type=prompt('Type? (website, website+portal)','website+portal');
-  const r=await fetch('/api/projects',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,type,brief:'Created from dashboard'})});
-  const j=await r.json();alert('Created: '+j.slug);loadProjects();
+async function browseSearch(){
+  const q=document.getElementById('browseQ').value.trim();if(!q)return;
+  document.getElementById('browseResults').innerHTML='<div style="font-size:12px;color:#64748B">🔍 Searching internet live…</div>';
+  try{
+    const r=await fetch('/api/browse/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,count:8})});
+    const j=await r.json();
+    document.getElementById('browseResults').innerHTML=j.results.map(w=>`<div style="padding:10px;border:1px solid var(--line);border-radius:10px;background:white"><div style="font-weight:700;font-size:12px"><a href="${w.url}" target="_blank">${w.title||w.url}</a></div><div style="font-size:11px;color:#475569">${w.snippet||''}</div><div style="font-size:10px;color:#64748B">${w.url} • <button onclick="document.getElementById('fetchUrl').value='${w.url}';browseFetch()" style="font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--line);background:white;cursor:pointer">Fetch →</button></div></div>`).join('');
+  }catch(e){ document.getElementById('browseResults').textContent='Error: '+e.message; }
+  loadMemories();
 }
-renderAgents();checkHealth();loadProjects();loadStats();loadLeads();loadMemories();
+async function browseFetch(){
+  const url=document.getElementById('fetchUrl').value.trim();if(!url)return;
+  document.getElementById('browseResults').innerHTML='<div style="font-size:12px;color:#64748B">📄 Fetching page live…</div>';
+  try{
+    const r=await fetch('/api/browse/fetch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+    const j=await r.json();
+    document.getElementById('browseResults').innerHTML=`<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:white"><div style="font-weight:700;font-size:12px">${j.url} • ${j.length} chars</div><div style="font-size:11px;color:#475569;max-height:300px;overflow:auto;margin-top:8px;white-space:pre-wrap">${(j.content||'').slice(0,4000)}</div></div>`;
+  }catch(e){ document.getElementById('browseResults').textContent='Error: '+e.message; }
+  loadMemories();
+}
+renderAgents();checkHealth();loadBuilt();loadStats();loadLeads();loadMemories();
 setInterval(checkHealth,15000);
 </script>
 </body>
