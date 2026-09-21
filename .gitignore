@@ -1,0 +1,32 @@
+# Secrets - NEVER commit
+.env
+.env.local
+.env.production
+*.key
+*token*
+*secret*
+
+# Dependencies
+node_modules/
+dist/
+build/
+.next/
+out/
+
+# Local brain fallback (contains no secrets, but keep local)
+local-brain.json
+
+# OS
+.DS_Store
+*.log
+npm-debug.log*
+
+# Supabase
+.supabase/
+
+# Keep these
+!supabase_complete.sql
+!README*.md
+!public/
+!server.js
+!package.json
