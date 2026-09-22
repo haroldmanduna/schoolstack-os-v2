@@ -303,11 +303,12 @@ app.post('/api/portal/users', async (req, res) => {
 
 // STUDENTS — Teacher adds students + parents
 app.get('/api/students', async (req, res) => {
-  const { project_slug, class_name, limit = 100, search } = req.query;
+  const { project_slug, class_name, limit = 100, search, parent_email } = req.query;
   let q = supabase.from('students').select('*').order('created_at', { ascending: false }).limit(parseInt(limit));
   if (project_slug) q = q.eq('project_slug', project_slug);
   if (class_name) q = q.eq('class_name', class_name);
   if (search) q = q.ilike('name', `%${search}%`);
+  if (parent_email) q = q.ilike('parent_email', parent_email);
   const { data, error } = await q;
   if (error) return res.status(400).json({ error: error.message });
   res.json(data);
@@ -356,13 +357,26 @@ app.post('/api/students', async (req, res) => {
 
 // TERM RESULTS — Teacher posts end of term results + comments
 app.get('/api/results', async (req, res) => {
-  const { project_slug, student_name, class_name, term, year, limit = 100 } = req.query;
+  const { project_slug, student_name, class_name, term, year, limit = 100, parent_email } = req.query;
   let q = supabase.from('term_results').select('*').order('created_at', { ascending: false }).limit(parseInt(limit));
   if (project_slug) q = q.eq('project_slug', project_slug);
   if (student_name) q = q.ilike('student_name', `%${student_name}%`);
   if (class_name) q = q.eq('class_name', class_name);
   if (term) q = q.eq('term', term);
   if (year) q = q.eq('year', parseInt(year));
+  // Parent privacy: if parent_email provided, only show their child's results
+  if (parent_email) {
+    try {
+      const { data: students } = await supabase.from('students').select('name').eq('project_slug', project_slug || 'sobukhazi-high-school').ilike('parent_email', parent_email).limit(20);
+      if (students && students.length > 0) {
+        const names = students.map(s => s.name);
+        q = q.in('student_name', names);
+      } else {
+        // No linked student, return empty
+        return res.json([]);
+      }
+    } catch {}
+  }
   const { data, error } = await q;
   if (error) return res.status(400).json({ error: error.message });
   res.json(data);
@@ -372,7 +386,6 @@ app.post('/api/results', async (req, res) => {
   const { project_slug, student_id, student_name, class_name, term, year, subjects, total, average, position, total_students, teacher_comment, head_comment, conduct, attendance_pct, published, created_by, created_by_name } = req.body;
   if (!student_name || !class_name || !term) return res.status(400).json({ error: 'student_name, class_name, term required' });
   
-  // Calculate total/average if subjects provided
   let calcTotal = total;
   let calcAvg = average;
   if (subjects && Array.isArray(subjects) && subjects.length > 0 && !total) {
@@ -399,7 +412,6 @@ app.post('/api/results', async (req, res) => {
   
   if (error) return res.status(400).json({ error: error.message });
 
-  // Notify parent
   try {
     await supabase.from('parent_notifications').insert({
       student_name,
@@ -412,6 +424,84 @@ app.post('/api/results', async (req, res) => {
   } catch {}
 
   res.json(data);
+});
+
+// BULK RESULTS — Teacher pastes whole class at once (spreadsheet / CSV)
+app.post('/api/results/bulk', async (req, res) => {
+  const { project_slug, class_name, term, year, subjects_list, results, created_by, created_by_name } = req.body;
+  // results = [{student_name, scores: {English:78, Maths:85}, teacher_comment, position, ...}]
+  if (!class_name || !term || !results || !Array.isArray(results)) return res.status(400).json({ error: 'class_name, term, results array required' });
+  
+  const yearVal = year ? parseInt(year) : new Date().getFullYear();
+  const subjList = subjects_list && subjects_list.length ? subjects_list : ['English','Mathematics','Combined Science','Heritage','Ndebele'];
+  
+  function gradeFromScore(s){
+    s=parseInt(s)||0;
+    if(s>=80) return 'A'; if(s>=70) return 'B'; if(s>=60) return 'C'; if(s>=50) return 'D'; if(s>=40) return 'E'; return 'U';
+  }
+
+  const toInsert = [];
+  for (const r of results) {
+    if (!r.student_name) continue;
+    const subjects = [];
+    let total = 0;
+    let count = 0;
+    // scores can be object or array
+    if (r.scores && typeof r.scores === 'object' && !Array.isArray(r.scores)) {
+      for (const subName of subjList) {
+        const sc = r.scores[subName] ?? r.scores[subName.toLowerCase()] ?? null;
+        if (sc !== null && sc !== '' && !isNaN(sc)) {
+          const score = parseInt(sc);
+          subjects.push({ name: subName, score, grade: gradeFromScore(score), comment: '' });
+          total += score; count++;
+        }
+      }
+    } else if (Array.isArray(r.subjects)) {
+      for (const s of r.subjects) {
+        const score = parseInt(s.score||0);
+        subjects.push({ name: s.name, score, grade: s.grade||gradeFromScore(score), comment: s.comment||'' });
+        total += score; count++;
+      }
+    }
+    const avg = count ? (total/count).toFixed(1) : null;
+    toInsert.push({
+      project_slug: project_slug || 'sobukhazi-high-school',
+      student_name: r.student_name,
+      class_name,
+      term,
+      year: yearVal,
+      subjects,
+      total: total||null,
+      average: avg?parseFloat(avg):null,
+      position: r.position?parseInt(r.position):null,
+      teacher_comment: r.teacher_comment||'',
+      conduct: r.conduct||'',
+      attendance_pct: r.attendance_pct?parseFloat(r.attendance_pct):null,
+      published: true,
+      created_by: created_by||'teacher',
+      created_by_name: created_by_name||'Teacher'
+    });
+  }
+
+  if (toInsert.length===0) return res.status(400).json({ error: 'No valid results' });
+
+  const { data, error } = await supabase.from('term_results').insert(toInsert).select();
+  if (error) return res.status(400).json({ error: error.message });
+
+  // Notify parents in batch
+  try {
+    const notifs = data.map(d => ({
+      student_name: d.student_name,
+      type: 'result_published',
+      title: `Results: ${term} ${yearVal} for ${d.student_name}`,
+      message: `${d.student_name} (${class_name}) ${term} results published. Average: ${d.average}%. See portal.`,
+      data: { term, year: yearVal, average: d.average, result_id: d.id },
+      channel: ['portal','sms']
+    }));
+    await supabase.from('parent_notifications').insert(notifs);
+  } catch {}
+
+  res.json({ success: true, count: data.length, results: data });
 });
 
 app.post('/api/portal/login', async (req, res) => {
