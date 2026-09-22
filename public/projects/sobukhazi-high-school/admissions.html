@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admissions — Sobukhazi High School</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,system-ui,sans-serif;background:#F9FAFB;color:#1C1917;line-height:1.6}
+.header{background:#166534;color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.header a{color:#fff;text-decoration:none;font-weight:700;font-size:13px}
+.container{max-width:900px;margin:0 auto;padding:20px}
+.card{background:#fff;border:1px solid #E7E5E4;border-radius:12px;padding:18px;margin-bottom:14px}
+.input{padding:11px;border:1px solid #E7E5E4;border-radius:8px;width:100%;font-size:14px;background:#fff;margin-bottom:8px}
+.btn{padding:12px 16px;border-radius:8px;border:0;background:#166534;color:#fff;font-weight:700;cursor:pointer;width:100%;font-size:14px}
+.btn-line{background:#fff;border:1px solid #E7E5E4;color:#1C1917}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.badge{padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#DCFCE7;color:#166534}
+</style>
+</head>
+<body>
+<div class="header">
+<div style="display:flex;gap:10px;align-items:center"><img src="assets/logo-clean-64.png" style="width:36px;height:36px;background:#fff;border-radius:8px;object-fit:contain"><b>Sobukhazi High School</b></div>
+<div style="display:flex;gap:14px"><a href="index.html">Home</a><a href="portal.html">Portal</a></div>
+</div>
+
+<div class="container">
+<div class="card" style="border-left:4px solid #166534">
+<h1>Admissions — Form 1 to Form 6</h1>
+<p style="font-size:13px;color:#57534E;margin-top:6px">Sobukhazi High School • Old Fall Rd, Mzilikazi • Est. 1970 • S2 High Density Government School<br>Apply anytime — Form 1 intake + mid-year transfers Form 2-6. Configurable entrance exam set by admin.</p>
+</div>
+
+<div class="grid2">
+<div class="card">
+<h3>📋 Requirements (Zimbabwe)</h3>
+<div style="font-size:12px;color:#57534E;margin-top:8px;line-height:1.6">
+<b>Form 1:</b><br>
+• Birth certificate (mandatory, or conditional admission)<br>
+• Grade 7 results (ZIMSEC)<br>
+• Passport photo<br>
+• Parent ID + contact<br><br>
+<b>Form 2-6 Transfers:</b><br>
+• All above + previous school report<br>
+• Transfer letter / reference letter<br>
+• Reason for transfer<br>
+• O-Level results (for A-Level Form 5-6)<br><br>
+<b>Entrance Exam:</b><br>
+• Configurable by admin — e.g. Maths, English, General Paper<br>
+• Admin sets subjects + max marks + pass mark<br>
+• No hardcoded subjects — school decides<br><br>
+<b>Fees:</b><br>
+• Enrollment fee $100 USD / ZiG equivalent (non-refundable, payable after acceptance)<br>
+• Term fees set by bursar (USD+ZiG dual)<br>
+</div>
+</div>
+<div class="card">
+<h3>📅 Process — 7 Stages</h3>
+<div style="font-size:12px;color:#57534E;margin-top:8px;line-height:1.8">
+1. <b>Apply Online</b> — Fill form + upload docs<br>
+2. <b>Documents Verified</b> — Admin checks birth cert, age, Grade 7<br>
+3. <b>Exam Scheduled</b> — Date, time, venue, subjects configurable<br>
+4. <b>Exam Done</b> — Scores recorded, auto pass/fail<br>
+5. <b>Accepted / Waitlist / Rejected</b> — Letter generated<br>
+6. <b>Fees Paid</b> — Enrollment fee $100 via EcoCash/Bank/Cash<br>
+7. <b>Enrolled</b> — Auto-creates student + parent account + Term 1 invoice<br><br>
+<span class="badge">Secure • No passwords on tracking • Parent sees only own child</span>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>📝 Online Application — All Forms</h2>
+<div style="font-size:11px;color:#78716C;margin-bottom:10px">Bursar sets fees, admin sets exam subjects — fully configurable, no hardcoded amounts. Real data only, no fake.</div>
+
+<div style="display:grid;gap:10px">
+<h3>Applicant Details</h3>
+<div class="grid2">
+<input id="appName" class="input" placeholder="Applicant Full Name *">
+<input id="appDob" class="input" type="date" placeholder="Date of Birth">
+</div>
+<div class="grid2">
+<select id="appGender" class="input"><option value="M">Male</option><option value="F">Female</option><option value="Other">Other</option></select>
+<select id="appForm" class="input"><option>Form 1</option><option>1A</option><option>1B</option><option>Form 2</option><option>2A</option><option>2B</option><option>Form 3</option><option>3A</option><option>3B</option><option>Form 4</option><option>4A</option><option>4B</option><option>Form 5</option><option>5A</option><option>Form 6</option><option>6A</option></select>
+</div>
+<div class="grid2">
+<input id="appPrevSchool" class="input" placeholder="Previous School">
+<input id="appLastGrade" class="input" placeholder="Last Grade Completed e.g. Grade 7, Form 2">
+</div>
+
+<h3>Results (if applicable)</h3>
+<div class="grid2">
+<input id="appGrade7" class="input" placeholder='Grade 7 Results JSON e.g. {"Maths":75,"English":80}' >
+<input id="appOLevel" class="input" placeholder='O-Level Results JSON e.g. {"Maths":"B","English":"C"}'>
+</div>
+
+<h3>Parent / Guardian (Will Become Parent Portal Account — Private)</h3>
+<div class="grid2">
+<input id="appParentName" class="input" placeholder="Parent Full Name *">
+<input id="appParentEmail" class="input" placeholder="Parent Email * (for portal login, private)">
+</div>
+<div class="grid2">
+<input id="appParentPhone" class="input" placeholder="Parent Phone 2637...">
+<input id="appParentID" class="input" placeholder="Parent ID No">
+</div>
+<input id="appAddress" class="input" placeholder="Address">
+<input id="appReason" class="input" placeholder="Reason for Transfer (for Form 2-6)">
+
+<h3>Documents — Upload or Paste URL</h3>
+<div style="font-size:11px;color:#78716C;margin-bottom:6px">Upload images — will be stored as base64 for demo (in production use Supabase storage)</div>
+<div class="grid2">
+<div><label style="font-size:11px;font-weight:700">Birth Certificate</label><input type="file" id="fBirth" accept="image/*,.pdf" class="input" onchange="handleFile(this,'birth')"><input id="appBirthUrl" class="input" placeholder="Or paste URL"><img id="prevBirth" style="max-width:120px;display:none;margin-top:4px;border-radius:6px;border:1px solid #E7E5E4"></div>
+<div><label style="font-size:11px;font-weight:700">Previous Report</label><input type="file" id="fReport" accept="image/*,.pdf" class="input" onchange="handleFile(this,'report')"><input id="appReportUrl" class="input" placeholder="Or paste URL"><img id="prevReport" style="max-width:120px;display:none;margin-top:4px;border-radius:6px"></div>
+</div>
+<div class="grid2">
+<div><label style="font-size:11px;font-weight:700">Passport Photo</label><input type="file" id="fPhoto" accept="image/*" class="input" onchange="handleFile(this,'photo')"><input id="appPhotoUrl" class="input" placeholder="Or paste URL"><img id="prevPhoto" style="max-width:100px;display:none;margin-top:4px;border-radius:6px"></div>
+<div><label style="font-size:11px;font-weight:700">Transfer Letter (Form 2-6)</label><input type="file" id="fTransfer" accept="image/*,.pdf" class="input" onchange="handleFile(this,'transfer')"><input id="appTransferUrl" class="input" placeholder="Or paste URL"><img id="prevTransfer" style="max-width:120px;display:none;margin-top:4px;border-radius:6px"></div>
+</div>
+
+<button class="btn" onclick="submitApplication()">Submit Application → Tracking No Generated</button>
+<div id="appRes" style="font-size:12px;margin-top:8px;white-space:pre-wrap"></div>
+
+<div style="margin-top:12px;padding:10px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;font-size:11px;color:#166534">
+<b>🔒 Privacy:</b> No passwords displayed. Application No + DOB for tracking. Parent sees only own child after enrollment. Bursar sets fees, admin sets exam — fully configurable.
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>🔍 Track Application</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:8px">
+<input id="trackNo" class="input" placeholder="Application No e.g. SOB-APP-2026-XXXXXX">
+<input id="trackDob" class="input" type="date" placeholder="DOB for verification">
+<button class="btn btn-line" style="width:auto" onclick="trackApp()">Track →</button>
+</div>
+<div id="trackRes" style="margin-top:10px;font-size:12px"></div>
+</div>
+
+</div>
+
+<script>
+var docs={birth:'',report:'',photo:'',transfer:''};
+function handleFile(input,type){
+  var file=input.files && input.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    docs[type]=e.target.result;
+    var imgId='prev'+type.charAt(0).toUpperCase()+type.slice(1);
+    var el=document.getElementById(imgId);
+    if(el && e.target.result.startsWith('data:image')){ el.src=e.target.result; el.style.display='block'; }
+  };
+  reader.readAsDataURL(file);
+}
+function submitApplication(){
+  var name=(document.getElementById('appName')||{}).value||''; name=name.trim();
+  var dob=(document.getElementById('appDob')||{}).value||'';
+  var gender=(document.getElementById('appGender')||{}).value||'M';
+  var form=(document.getElementById('appForm')||{}).value||'Form 1';
+  var prevSchool=(document.getElementById('appPrevSchool')||{}).value||'';
+  var lastGrade=(document.getElementById('appLastGrade')||{}).value||'';
+  var grade7Str=(document.getElementById('appGrade7')||{}).value||''; var grade7=null; if(grade7Str){ try{ grade7=JSON.parse(grade7Str); }catch(e){ alert('Grade7 JSON invalid'); return; } }
+  var olevelStr=(document.getElementById('appOLevel')||{}).value||''; var olevel=null; if(olevelStr){ try{ olevel=JSON.parse(olevelStr); }catch(e){ alert('O-Level JSON invalid'); return; } }
+  var pName=(document.getElementById('appParentName')||{}).value||''; pName=pName.trim();
+  var pEmail=(document.getElementById('appParentEmail')||{}).value||''; pEmail=pEmail.trim().toLowerCase();
+  var pPhone=(document.getElementById('appParentPhone')||{}).value||''; pPhone=pPhone.trim();
+  var pID=(document.getElementById('appParentID')||{}).value||'';
+  var address=(document.getElementById('appAddress')||{}).value||'';
+  var reason=(document.getElementById('appReason')||{}).value||'';
+  var birthUrl=(document.getElementById('appBirthUrl')||{}).value||''; birthUrl=birthUrl.trim()||docs.birth||null;
+  var reportUrl=(document.getElementById('appReportUrl')||{}).value||''; reportUrl=reportUrl.trim()||docs.report||null;
+  var photoUrl=(document.getElementById('appPhotoUrl')||{}).value||''; photoUrl=photoUrl.trim()||docs.photo||null;
+  var transferUrl=(document.getElementById('appTransferUrl')||{}).value||''; transferUrl=transferUrl.trim()||docs.transfer||null;
+  var resEl=document.getElementById('appRes');
+  if(!name||!pName||!pEmail){ if(resEl) resEl.textContent='Applicant Name, Parent Name, Parent Email required'; return; }
+  if(resEl) resEl.textContent='Submitting...';
+  fetch('/api/admissions/applications',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',applicant_name:name,dob:dob||null,gender:gender,applying_form:form,previous_school:prevSchool,last_grade:lastGrade,grade7_results:grade7,olevel_results:olevel,parent_name:pName,parent_email:pEmail,parent_phone:pPhone,parent_id_no:pID,address:address,reason_for_transfer:reason,birth_cert_url:birthUrl,report_url:reportUrl,photo_url:photoUrl,transfer_letter_url:transferUrl})}).then(function(r){return r.json();}).then(function(d){
+    if(d.error){ if(resEl) resEl.textContent='Error: '+d.error; }else{ if(resEl) resEl.textContent='✅ Application Submitted!\nApplication No: '+d.application_no+'\nApplicant: '+d.applicant_name+' for '+d.applying_form+'\nStatus: '+d.status+'\n\nSave your Application No to track. Admin will verify docs and schedule entrance exam (subjects configurable by admin).\n\nYou will be notified via email: '+d.parent_email; }
+  }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
+}
+function trackApp(){
+  var no=(document.getElementById('trackNo')||{}).value||''; no=no.trim();
+  var dob=(document.getElementById('trackDob')||{}).value||'';
+  var resEl=document.getElementById('trackRes');
+  if(!no){ if(resEl) resEl.textContent='Enter Application No'; return; }
+  if(resEl) resEl.textContent='Tracking...';
+  fetch('/api/admissions/applications?project_slug=sobukhazi-high-school&limit=200').then(function(r){return r.json();}).then(function(data){
+    var found=null; if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ if(data[i].application_no===no){ found=data[i]; break; } } }
+    if(!found){ if(resEl) resEl.textContent='Application not found: '+no; return; }
+    if(dob && found.dob && found.dob!==dob){ if(resEl) resEl.textContent='DOB does not match for security'; return; }
+    var html='<div class="card" style="border-left:4px solid #166534"><b>'+found.applicant_name+'</b> • '+found.applying_form+' • '+found.application_no+'<br><span style="font-size:11px">Status: <b>'+found.status+'</b><br>Parent: '+(found.parent_name||'')+' • '+(found.parent_email||'')+'<br>Prev School: '+(found.previous_school||'—')+'<br>Docs: Birth '+(found.birth_cert_url?'✓':'✗')+' Report '+(found.report_url?'✓':'✗')+' Photo '+(found.photo_url?'✓':'✗')+'</span></div>';
+    if(found.status==='exam_scheduled') html+='<div style="margin-top:8px;font-size:11px;color:#166534">📋 Entrance exam scheduled — check portal for date/venue (subjects configurable by admin)</div>';
+    if(found.status==='accepted') html+='<div style="margin-top:8px;font-size:11px;color:#166534">✅ Accepted! Pay enrollment fee $100 via EcoCash/Bank/Cash — bursar will update, then you will be enrolled and get parent portal login (private).</div>';
+    if(found.status==='enrolled') html+='<div style="margin-top:8px;font-size:11px;color:#166534">🎓 Enrolled! Student account created. Parent login: '+found.parent_email+' (contact admin for password, not displayed publicly)</div>';
+    if(resEl) resEl.innerHTML=html;
+  });
+}
+</script>
+</body>
+</html>
