@@ -234,86 +234,48 @@ Additional context: ${context}
 `;
 
   try {
-    // Use better model for Sobukhazi - Claude-like quality
-    const model = project_slug === 'sobukhazi-high-school' ? 'anthropic/claude-3.5-sonnet' : 'openai/gpt-4o-mini';
+    // Use better model for Sobukhazi - Claude-level quality (fixed ID)
+    const model = project_slug === 'sobukhazi-high-school' ? 'anthropic/claude-3-5-sonnet' : 'openai/gpt-4o-mini';
     const fallbackModel = 'openai/gpt-4o-mini';
+    const fallbackModel2 = 'anthropic/claude-3-haiku';
     
     let res;
-    try {
-      res = await fetch(OPENROUTER_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENROUTER_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://schoolstack.bulawayo',
-          'X-Title': 'SchoolStack Second Brain'
-        },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: question }
-          ],
-          max_tokens: 1500,
-          temperature: 0.7
-        })
-      });
-    } catch (e) {
-      // Fallback to gpt-4o-mini if claude fails
-      res = await fetch(OPENROUTER_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENROUTER_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://schoolstack.bulawayo',
-          'X-Title': 'SchoolStack Second Brain'
-        },
-        body: JSON.stringify({
-          model: fallbackModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: question }
-          ],
-          max_tokens: 1200,
-          temperature: 0.7
-        })
-      });
+    let lastError = null;
+    const modelsToTry = [model, fallbackModel, fallbackModel2];
+    let json = null;
+    for (const m of modelsToTry) {
+      try {
+        res = await fetch(OPENROUTER_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENROUTER_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://schoolstack.bulawayo',
+            'X-Title': 'SchoolStack Second Brain'
+          },
+          body: JSON.stringify({
+            model: m,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: question }
+            ],
+            max_tokens: 1500,
+            temperature: 0.7
+          })
+        });
+        json = await res.json();
+        if (!json.error) break;
+        lastError = json.error;
+        console.log(`Model ${m} failed: ${json.error.message}, trying next...`);
+      } catch (e) {
+        lastError = e;
+        console.log(`Model ${m} fetch failed: ${e.message}`);
+      }
     }
 
-    const json = await res.json();
-    if (json.error) {
-      console.error('OpenRouter error:', json.error);
-      // Try fallback model
-      const fallbackRes = await fetch(OPENROUTER_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENROUTER_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://schoolstack.bulawayo',
-          'X-Title': 'SchoolStack Second Brain'
-        },
-        body: JSON.stringify({
-          model: 'openai/gpt-4o-mini',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: question }
-          ],
-          max_tokens: 1000
-        })
-      });
-      const fallbackJson = await fallbackRes.json();
-      if (fallbackJson.error) {
-        return { answer: `Brain error: ${json.error.message}. Memories: ${memories.length}, Web: ${webResults.length}`, memories, webResults };
-      }
-      const answer = fallbackJson.choices?.[0]?.message?.content || 'No answer';
-      await addMemory({
-        agent_name: 'nexus',
-        memory_type: 'learning',
-        title: `Q: ${question.slice(0, 80)}`,
-        content: `Q: ${question}\nA: ${answer}\nWeb: ${webResults.length} results`,
-        metadata: { project_slug, webResults: webResults.length }
-      });
-      return { answer, memories, webResults, source: 'openrouter-fallback' };
+    if (!json || json.error) {
+      console.error('OpenRouter all models error:', lastError);
+      return { answer: `Brain error: ${lastError?.message || 'all models failed'}. Memories: ${memories.length}, Web: ${webResults.length}`, memories, webResults };
     }
     const answer = json.choices?.[0]?.message?.content || 'No answer';
     
