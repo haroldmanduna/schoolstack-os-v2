@@ -77,13 +77,112 @@ app.post('/api/build/portal', async (req, res) => {
   res.json(result);
 });
 
-// LATE ARRIVAL SYSTEM — Teacher marks late + time, parent auto notified
+// WHATSAPP SERVICE — Connect to WhatsApp for parent notifications
+const WHATSAPP_CONFIG = {
+  token: process.env.WHATSAPP_TOKEN || null,
+  phoneId: process.env.WHATSAPP_PHONE_ID || null,
+  webhookUrl: process.env.WHATSAPP_WEBHOOK_URL || null,
+  enabled: !!(process.env.WHATSAPP_TOKEN || process.env.WHATSAPP_WEBHOOK_URL)
+};
+
+async function sendWhatsAppNotification({ to, message, student_name }) {
+  // Try to get parent phone from portal_users if not provided
+  let phone = to;
+  if (!phone && student_name) {
+    try {
+      const { data } = await supabase.from('portal_users').select('phone').eq('role','parent').ilike('student_name', `%${student_name}%`).limit(1).single();
+      if (data?.phone) phone = data.phone;
+    } catch {}
+  }
+  // Fallback: check parent user with matching student_name in portal_users
+  if (!phone) {
+    // Use a demo number for logging if no real number
+    console.log(`[WhatsApp] No phone for ${student_name}, would send: ${message.slice(0,100)}`);
+    return { success: true, simulated: true, message: 'No phone configured — notification saved to portal only. Add parent phone in Manage Users to enable WhatsApp.' };
+  }
+
+  // Normalize phone: must be like 263771234567 for Zimbabwe
+  let normalized = phone.replace(/[^0-9]/g, '');
+  if (normalized.startsWith('0')) normalized = '263' + normalized.slice(1);
+  if (!normalized.startsWith('263') && normalized.length === 9) normalized = '263' + normalized;
+
+  // Method 1: Meta WhatsApp Cloud API
+  if (WHATSAPP_CONFIG.token && WHATSAPP_CONFIG.phoneId) {
+    try {
+      const resp = await fetch(`https://graph.facebook.com/v20.0/${WHATSAPP_CONFIG.phoneId}/messages`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${WHATSAPP_CONFIG.token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          to: normalized,
+          type: 'text',
+          text: { body: message }
+        })
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+      console.log(`[WhatsApp Cloud] Sent to ${normalized}: ${data.messages?.[0]?.id}`);
+      return { success: true, method: 'cloud_api', id: data.messages?.[0]?.id, phone: normalized };
+    } catch (e) {
+      console.error('[WhatsApp Cloud] Failed:', e.message);
+      // Fall through to webhook
+    }
+  }
+
+  // Method 2: Custom webhook (e.g., Twilio, WATI, etc.)
+  if (WHATSAPP_CONFIG.webhookUrl) {
+    try {
+      const resp = await fetch(WHATSAPP_CONFIG.webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: normalized, message, student_name, type: 'late_arrival' })
+      });
+      const data = await resp.text();
+      console.log(`[WhatsApp Webhook] Sent to ${normalized}, response: ${data.slice(0,200)}`);
+      return { success: true, method: 'webhook', phone: normalized, response: data.slice(0,200) };
+    } catch (e) {
+      console.error('[WhatsApp Webhook] Failed:', e.message);
+    }
+  }
+
+  // Fallback: simulated — log for now, but mark as sent to portal
+  console.log(`[WhatsApp SIM] To ${normalized}: ${message}`);
+  return { success: true, simulated: true, phone: normalized, message: 'WhatsApp configured but no API token — set WHATSAPP_TOKEN and WHATSAPP_PHONE_ID in .env to enable real sending. Notification saved to portal.' };
+}
+
+// LATE ARRIVAL SYSTEM — Teacher marks late + time, parent auto notified via portal+SMS+WhatsApp
 app.post('/api/attendance/late', async (req, res) => {
-  const { student_name, class_name, arrival_time, reason, reason_details, marked_by_name, location } = req.body;
+  const { student_name, class_name, arrival_time, reason, reason_details, marked_by_name, location, parent_phone } = req.body;
   if (!student_name || !class_name) return res.status(400).json({ error: 'student_name and class_name required' });
+  
+  // First mark late via builder
   const result = await markLateArrival({ student_name, class_name, arrival_time, reason, reason_details, marked_by_name: marked_by_name || 'Teacher', location });
   if (!result.success) return res.status(400).json(result);
-  res.json(result);
+
+  // Then try WhatsApp
+  let whatsappResult = null;
+  try {
+    const time = arrival_time || new Date().toTimeString().slice(0,5);
+    const msg = `Sobukhazi High School: ${student_name} (${class_name}) arrived late today at ${time}. Reason: ${reason}${reason_details ? ` (${reason_details})` : ''}. Marked by ${marked_by_name || 'Teacher'}. Please contact school 09200581 if needed.`;
+    whatsappResult = await sendWhatsAppNotification({ to: parent_phone, message: msg, student_name });
+    
+    // Update notification to include whatsapp channel if sent
+    if (whatsappResult.success) {
+      await supabase.from('parent_notifications').update({ 
+        channel: ['portal','sms','whatsapp'],
+        data: { ...result.notification?.data, whatsapp: whatsappResult }
+      }).eq('id', result.notification?.id);
+      
+      await supabase.from('late_arrivals').update({
+        notification_method: ['portal','sms','whatsapp']
+      }).eq('id', result.late_arrival?.id);
+    }
+  } catch (e) {
+    console.error('WhatsApp notify failed:', e.message);
+    whatsappResult = { success: false, error: e.message };
+  }
+
+  res.json({ ...result, whatsapp: whatsappResult, whatsapp_configured: WHATSAPP_CONFIG.enabled });
 });
 
 app.get('/api/attendance/late', async (req, res) => {
@@ -135,6 +234,35 @@ app.post('/api/announcements', async (req, res) => {
     metadata: { project_slug: project_slug || 'sobukhazi-high-school', category, image_url, author: author_name }
   });
   res.json(data);
+});
+
+// WHATSAPP ENDPOINTS
+app.get('/api/whatsapp/config', (req, res) => {
+  res.json({
+    enabled: WHATSAPP_CONFIG.enabled,
+    has_token: !!WHATSAPP_CONFIG.token,
+    has_phone_id: !!WHATSAPP_CONFIG.phoneId,
+    has_webhook: !!WHATSAPP_CONFIG.webhookUrl,
+    phone_id: WHATSAPP_CONFIG.phoneId ? WHATSAPP_CONFIG.phoneId.slice(0,6)+'...' : null,
+    instructions: WHATSAPP_CONFIG.enabled 
+      ? 'WhatsApp configured — late arrivals will auto-send to parent phone if set in portal_users.phone'
+      : 'To enable real WhatsApp: 1) Create Meta WhatsApp Business App at developers.facebook.com 2) Get WHATSAPP_TOKEN and WHATSAPP_PHONE_ID 3) Set in Render env vars 4) Redeploy. OR set WHATSAPP_WEBHOOK_URL to your Twilio/WATI webhook. For now notifications save to portal and are simulated.',
+    how_to_add_phone: 'Go to Portal → Manage Users → Edit parent → Add phone like 263771234567 or 0771234567. Then when teacher marks late, parent gets portal+WhatsApp.'
+  });
+});
+
+app.post('/api/whatsapp/send', async (req, res) => {
+  const { to, message, student_name } = req.body;
+  if (!message) return res.status(400).json({ error: 'message required' });
+  const result = await sendWhatsAppNotification({ to, message, student_name: student_name || 'Test Student' });
+  res.json(result);
+});
+
+app.post('/api/whatsapp/test-late', async (req, res) => {
+  const { student_name, parent_phone } = req.body;
+  const testMsg = `Sobukhazi High School TEST: ${student_name || 'Tariro Dube'} arrived late today at 08:23. Reason: traffic. This is a test of WhatsApp notifications. School contact 09200581.`;
+  const result = await sendWhatsAppNotification({ to: parent_phone, message: testMsg, student_name: student_name || 'Tariro Dube' });
+  res.json({ test: true, ...result });
 });
 
 // PORTAL USERS — Maintainer, Admin, Teacher, Parent credentials

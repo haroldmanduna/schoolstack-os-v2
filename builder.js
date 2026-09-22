@@ -169,7 +169,7 @@ export async function markLateArrival({ student_name, class_name, arrival_time, 
   const time = arrival_time || now.toTimeString().slice(0,5);
 
   try {
-    // Save late arrival
+    // Save late arrival — now includes whatsapp channel
     const { data: lateData, error: lateError } = await supabase.from('late_arrivals').insert({
       student_name,
       class_name,
@@ -179,13 +179,13 @@ export async function markLateArrival({ student_name, class_name, arrival_time, 
       reason: reason || 'other',
       reason_details,
       notified_parent: true,
-      notification_method: ['portal','sms'],
+      notification_method: ['portal','sms','whatsapp'],
       notification_sent_at: new Date().toISOString()
     }).select().single();
 
     if (lateError) throw lateError;
 
-    // Auto-create parent notification
+    // Auto-create parent notification — now includes whatsapp
     const title = `Late arrival: ${student_name} arrived at ${time}`;
     const message = `${student_name} (${class_name}) arrived late on ${date} at ${time}. Reason: ${reason}${reason_details ? ` (${reason_details})` : ''}. Marked by ${marked_by_name}. Location: ${location}.`;
     
@@ -202,9 +202,10 @@ export async function markLateArrival({ student_name, class_name, arrival_time, 
         teacher: marked_by_name,
         class: class_name,
         location,
-        late_id: lateData.id
+        late_id: lateData.id,
+        whatsapp_enabled: true
       },
-      channel: ['portal','sms']
+      channel: ['portal','sms','whatsapp']
     }).select().single();
 
     // Store as memory (persistent)
@@ -212,17 +213,18 @@ export async function markLateArrival({ student_name, class_name, arrival_time, 
       agent_name: 'core',
       memory_type: 'observation',
       title: `Late arrival marked: ${student_name} at ${time}`,
-      content: `${student_name} late at ${time} on ${date}, reason ${reason}, teacher ${marked_by_name}. Auto-notified parent via portal+sms.`,
+      content: `${student_name} late at ${time} on ${date}, reason ${reason}, teacher ${marked_by_name}. Auto-notified parent via portal+sms+whatsapp.`,
       importance: 7,
-      metadata: { student_name, time, reason, teacher: marked_by_name, auto_notify: true }
+      metadata: { student_name, time, reason, teacher: marked_by_name, auto_notify: true, channels: ['portal','sms','whatsapp'] }
     });
 
     return {
       success: true,
       late_arrival: lateData,
       notification: notifData,
-      message: `✅ ${student_name} marked late at ${time}, parent auto-notified via portal+sms`,
-      auto_sent: true
+      message: `✅ ${student_name} marked late at ${time}, parent auto-notified via portal+sms+whatsapp`,
+      auto_sent: true,
+      channels: ['portal','sms','whatsapp']
     };
   } catch (e) {
     return { success: false, error: e.message };

@@ -54,12 +54,14 @@ body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--sla
 <div id="loginMsg" style="font-size:12px;color:var(--muted)"></div>
 </div>
 <div style="margin-top:18px;padding:12px;background:var(--greenLight);border:1px solid #86EFAC;border-radius:10px;font-size:11px;color:#166534;line-height:1.5">
-<b>Default credentials (maintainer is you):</b><br>
-Maintainer: harold@schoolstack / admin123 — full access, add admins<br>
-Admin: admin@sobukhazi / admin123 — posts announcements, adds teachers/parents<br>
-Teacher: teacher@sobukhazi / teacher123 — marks late, attendance<br>
-Parent: parent@sobukhazi / parent123 — views child notifications<br><br>
-Add more users in Admin → Manage Users. Stored in Supabase + local.
+<b>YOUR CREDENTIALS (Maintainer = you):</b><br>
+<span style="background:white;padding:2px 6px;border-radius:4px;border:1px solid #86EFAC;font-weight:800">harold@schoolstack / admin123</span> — Maintainer (you) — full access, add admins, WhatsApp config<br>
+Admin: admin@sobukhazi / admin123 — posts announcements with pictures<br>
+Teacher: teacher@sobukhazi / teacher123 — marks late → parent WhatsApp<br>
+Parent: parent@sobukhazi / parent123 — views child + WhatsApp<br>
+Principal: principal@sobukhazi / principal123<br><br>
+Add more users in Admin → Manage Users with phone for WhatsApp. Stored in Supabase + local.<br>
+📘 Facebook Group: <a href="https://www.facebook.com/groups/1419241031630625/" target="_blank" style="color:#166534;font-weight:700">https://www.facebook.com/groups/1419241031630625/</a>
 </div>
 <div style="margin-top:12px;text-align:center"><a href="index.html" style="font-size:12px;color:var(--muted)">← Back to website</a></div>
 </div>
@@ -153,8 +155,12 @@ function showView(id){
   document.querySelectorAll('.side .tab').forEach(el=>el.classList.toggle('active', el.id==='tab-'+id));
   const main=document.getElementById('mainContent');
   if(id==='dashboard'){
-    main.innerHTML='<h2 style="font-size:20px;margin-bottom:12px">Dashboard • '+currentRole+'</h2><div class="grid-2"><div class="card"><b>Welcome, '+currentUser.name+'</b><div style="font-size:13px;color:var(--muted);margin-top:6px">Role: '+currentRole+'<br>Email: '+currentUser.email+'<br>School: Sobukhazi High School, Old Fall Rd, Mzilikazi, Est 1970<br>Green uniform heritage, 54 medals 2024.</div><div style="margin-top:10px"><a href="index.html" target="_blank" style="font-size:12px;color:var(--green);font-weight:700">View website →</a></div></div><div class="card"><b>Quick Stats</b><div style="font-size:13px;color:var(--muted);margin-top:8px">Late today: <span id="statLate">—</span><br>Announcements: <span id="statAnn">2</span><br>Users: '+users.length+'<br>Inquiries: <span id="statInq">—</span></div></div></div><div style="margin-top:12px" class="card"><b>What you can do as '+currentRole+'</b><div style="font-size:13px;color:var(--muted);margin-top:6px">'+(currentRole==='maintainer'?'Full access: add admins, manage all, post announcements, view everything. You are the super admin.':currentRole==='admin'?'Post announcements that appear on homepage News, add teachers and parents, view late arrivals and inquiries.':currentRole==='teacher'?'Mark late arrival with time (10 sec) → parent auto notified, mark attendance, upload results via Excel.':'View your child late notifications, results, fees, and school announcements.')+'</div></div>';
+    main.innerHTML='<h2 style="font-size:20px;margin-bottom:12px">Dashboard • '+currentRole+'</h2><div class="grid-2"><div class="card"><b>Welcome, '+currentUser.name+'</b><div style="font-size:13px;color:var(--muted);margin-top:6px">Role: '+currentRole+'<br>Email: '+currentUser.email+'<br>Password: '+(currentUser.password||'••••')+'<br>School: Sobukhazi High School, Old Fall Rd, Mzilikazi, Est 1970<br>Green uniform heritage, 54 medals 2024.<br><br><b>Your Credentials:</b><br>'+(currentRole==='maintainer'?'Maintainer (you): harold@schoolstack / admin123 — full access, add admins, WhatsApp config':'')+'<br>Admin: admin@sobukhazi / admin123<br>Teacher: teacher@sobukhazi / teacher123<br>Parent: parent@sobukhazi / parent123<br><br><a href=\"https://www.facebook.com/groups/1419241031630625/\" target=\"_blank\" style=\"color:#1877F2;font-weight:700\">📘 Facebook Group (1.4k)</a></div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><a href="index.html" target="_blank" style="font-size:12px;color:var(--green);font-weight:700">View website →</a><a href="https://www.facebook.com/groups/1419241031630625/" target="_blank" style="font-size:12px;color:#1877F2;font-weight:700">Facebook →</a></div></div><div class="card"><b>Quick Stats + WhatsApp</b><div style="font-size:13px;color:var(--muted);margin-top:8px">Late today: <span id="statLate">—</span><br>Announcements: <span id="statAnn">2</span><br>Users: '+users.length+'<br>Inquiries: <span id="statInq">—</span><br><br><b>WhatsApp Status:</b> <span id="waStatus">Checking...</span><br><div style="margin-top:8px;padding:8px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;font-size:11px"><b>To enable real WhatsApp:</b><br>1. Add parent phone in Manage Users (263771234567)<br>2. Set WHATSAPP_TOKEN + WHATSAPP_PHONE_ID in Render env<br>3. Teacher marks late → parent gets WhatsApp<br><span style="color:var(--green);font-weight:700">Current: portal+simulated WhatsApp</span></div></div></div></div><div style="margin-top:12px" class="card"><b>What you can do as '+currentRole+'</b><div style="font-size:13px;color:var(--muted);margin-top:6px">'+(currentRole==='maintainer'?'Full access: add admins, manage all, post announcements, view everything, WhatsApp config. You are the super admin (harold@schoolstack).':currentRole==='admin'?'Post announcements that appear on homepage News, add teachers and parents with phone for WhatsApp, view late arrivals and inquiries.':currentRole==='teacher'?'Mark late arrival with time (10 sec) → parent auto notified via portal+SMS+WhatsApp (if phone set), mark attendance, upload results via Excel.':'View your child late notifications (portal+WhatsApp if phone set), results, fees, and school announcements.')+'</div></div>';
     loadStats();
+    fetch('/api/whatsapp/config').then(r=>r.json()).then(d=>{
+      const el=document.getElementById('waStatus');
+      if(el) el.innerHTML = d.enabled ? '✅ Configured (token: '+(d.has_token?'yes':'no')+', phone: '+(d.has_phone_id?'yes':'no')+')' : '⚠️ Simulated — set WHATSAPP_TOKEN + PHONE_ID in Render env to enable real';
+    }).catch(()=>{});
   }else if(id==='announcements'){
     main.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h2 style="font-size:18px">Announcements • Posted by Admin</h2><button onclick="showView('post')" class="btn btn-green" style="display:'+(currentRole==='admin'||currentRole==='maintainer'?'inline-flex':'none')+'">+ Post New</button></div><div id="annListPortal" class="list" style="max-height:none"></div>';
     loadAnnouncementsPortal();
@@ -163,7 +169,7 @@ function showView(id){
     main.innerHTML='<h2 style="font-size:18px;margin-bottom:12px">Post Announcement • Appears on Website Homepage</h2><div class="card" style="max-width:600px"><div style="display:grid;gap:10px"><div><div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">Title</div><input id="annTitle" class="input" placeholder="e.g. Form 1 Admissions 2026 Open"></div><div><div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">Category</div><select id="annCat" class="input"><option>ACADEMICS</option><option>SPORTS</option><option>GENERAL</option><option>EVENTS</option></select></div><div><div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">Content</div><textarea id="annContent" class="input" style="height:120px" placeholder="Write announcement..."></textarea></div><div><div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">Image (optional URL)</div><input id="annImage" class="input" placeholder="https://... or leave empty"></div><button onclick="postAnnouncement()" class="btn btn-green">Post Announcement → Website</button><div id="annPostRes" style="font-size:12px;color:var(--muted)"></div></div></div>';
   }else if(id==='users'){
     if(currentRole!=='admin' && currentRole!=='maintainer'){ main.innerHTML='<div class="card">Only admin and maintainer can manage users.</div>'; return; }
-    main.innerHTML='<h2 style="font-size:18px;margin-bottom:12px">Manage Users • Add Teachers, Parents, Admins</h2><div class="grid-2"><div class="card"><b>Add New User</b><div style="display:grid;gap:8px;margin-top:10px"><input id="newName" class="input" placeholder="Full name"><input id="newEmail" class="input" placeholder="Email"><input id="newPass" class="input" placeholder="Password"><select id="newRole" class="input"><option value="teacher">Teacher</option><option value="parent">Parent</option><option value="admin">Admin</option>'+(currentRole==='maintainer'?'<option value="maintainer">Maintainer (you)</option>':'')+'</select><button onclick="addUser()" class="btn btn-green">Add User</button><div id="addUserRes" style="font-size:12px;color:var(--muted)"></div><div style="font-size:11px;color:var(--muted)">Maintainer can add admins. Admin can add teachers and parents.</div></div></div><div class="card"><b>Existing Users ('+users.length+')</b><div id="usersList" class="list" style="margin-top:10px;max-height:400px"></div></div></div>';
+    main.innerHTML='<h2 style="font-size:18px;margin-bottom:12px">Manage Users • Add Teachers, Parents, Admins</h2><div class="grid-2"><div class="card"><b>Add New User + WhatsApp Phone</b><div style="display:grid;gap:8px;margin-top:10px"><input id="newName" class="input" placeholder="Full name"><input id="newEmail" class="input" placeholder="Email"><input id="newPass" class="input" placeholder="Password"><input id="newPhone" class="input" placeholder="Phone for WhatsApp e.g. 263771234567 or 0771234567"><select id="newRole" class="input"><option value="teacher">Teacher</option><option value="parent">Parent</option><option value="admin">Admin</option>'+(currentRole==='maintainer'?'<option value="maintainer">Maintainer (you)</option>':'')+'</select><button onclick="addUser()" class="btn btn-green">Add User + Enable WhatsApp</button><div id="addUserRes" style="font-size:12px;color:var(--muted)"></div><div style="font-size:11px;color:var(--muted)">Phone enables WhatsApp notifications. Maintainer can add admins. Admin can add teachers and parents. Format: 263771234567</div></div></div><div class="card"><b>Existing Users ('+users.length+')</b><div id="usersList" class="list" style="margin-top:10px;max-height:400px"></div></div></div>';
     renderUsersList();
   }else if(id==='late'){
     main.innerHTML='<h2 style="font-size:18px;margin-bottom:12px">Late Arrivals • Teacher marks, parent auto notified</h2><div class="card" style="margin-bottom:12px;border-left:4px solid var(--green)"><div style="font-weight:700;margin-bottom:10px">Mark student late</div><div style="display:grid;grid-template-columns:1.2fr .8fr .8fr 1fr auto;gap:8px;align-items:end"><div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px">Student</div><select id="lateStudent" class="input"><option>Tariro Dube</option><option>Kudzai Dube</option><option>Mzi Ncube</option><option>Methembe Tshuma</option><option>Alpha Mpofu</option></select></div><div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px">Time</div><input id="lateTime" type="time" class="input"></div><div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px">Reason</div><select id="lateReason" class="input"><option>traffic</option><option>transport</option><option>illness</option><option>other</option></select></div><div><div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px">Details</div><input id="lateDetails" class="input" placeholder="Details"></div><div><button onclick="markLate()" class="btn btn-green">Save + Notify</button></div></div><div style="margin-top:8px"><input id="markedBy" class="input" value="'+currentUser.name+'" style="max-width:160px"><span style="font-size:11px;color:var(--muted)"> Auto-notifies parent</span></div><div id="lateResult" style="margin-top:8px;font-size:13px"></div></div><div class="grid-2"><div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><b>Today Late</b><button onclick="loadLates()" class="btn btn-line" style="padding:4px 8px;font-size:11px">Refresh</button></div><div id="lateList" class="list"></div></div><div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><b>Parent Notifications</b><button onclick="loadNotifs()" class="btn btn-line" style="padding:4px 8px;font-size:11px">Refresh</button></div><div id="notifList" class="list"></div></div></div>';
@@ -186,25 +192,44 @@ function showView(id){
   }
 }
 function renderUsersList(){
-  document.getElementById('usersList').innerHTML=users.map(u=>'<div class="item"><div><b style="font-size:12px">'+u.name+'</b><div style="font-size:11px;color:var(--muted)">'+u.email+' • '+u.role+'</div></div><button onclick="removeUser(''+u.email+'')" style="padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:white;font-size:11px">Remove</button></div>').join('');
+  document.getElementById('usersList').innerHTML=users.map(u=>'<div class="item"><div><b style="font-size:12px">'+u.name+'</b><div style="font-size:11px;color:var(--muted)">'+u.email+' • '+u.role+(u.phone?' • 📱 '+u.phone:'')+'</div></div><button onclick="removeUser(\''+u.email+'\')" style="padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:white;font-size:11px">Remove</button></div>').join('');
+  fetch('/api/portal/users?project_slug=sobukhazi-high-school&limit=100').then(r=>r.json()).then(data=>{
+    if(!data.error && Array.isArray(data)){
+      const el=document.getElementById('usersList');
+      if(el) el.innerHTML=data.map(u=>'<div class="item"><div><b style="font-size:12px">'+u.name+'</b><div style="font-size:11px;color:var(--muted)">'+u.email+' • '+u.role+(u.phone?' • 📱 '+u.phone:' • no phone')+(u.student_name?' • Child: '+u.student_name:'')+'</div></div><div style="display:flex;gap:4px"><button onclick="testWhatsApp(\''+(u.phone||'')+'\',\''+u.name+'\')" style="padding:4px 8px;border-radius:6px;border:1px solid #86EFAC;background:#F0FDF4;font-size:11px">Test WA</button><button onclick="removeUser(\''+u.email+'\')" style="padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:white;font-size:11px">Remove</button></div></div>').join('');
+    }
+  }).catch(()=>{});
 }
+async function testWhatsApp(phone, name){
+  if(!phone){alert('No phone set for '+name+'. Add phone in Manage Users first (e.g. 263771234567)');return;}
+  if(!confirm('Send test WhatsApp to '+phone+' for '+name+'?')) return;
+  const res = await fetch('/api/whatsapp/test-late',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name:name, parent_phone:phone})});
+  const data = await res.json();
+  alert('WhatsApp test to '+phone+': '+(data.success?'✅ Sent/simulated':'❌ Failed')+'
+Method: '+(data.method|| (data.simulated?'simulated':'unknown'))+'
+'+(data.message||'')+'
+
+Check /api/whatsapp/config for real setup');
+}
+
 async function addUser(){
   const name=document.getElementById('newName').value.trim();
   const email=document.getElementById('newEmail').value.trim().toLowerCase();
   const pass=document.getElementById('newPass').value;
+  const phone=document.getElementById('newPhone')?.value.trim()||'';
   const role=document.getElementById('newRole').value;
   if(!name||!email||!pass){document.getElementById('addUserRes').textContent='Fill all fields';return;}
   if(currentRole==='admin' && (role==='admin'||role==='maintainer')){document.getElementById('addUserRes').textContent='Admin can only add teacher and parent. Maintainer can add admin.';return;}
-  users.push({name,email,password:pass,role});
+  users.push({name,email,password:pass,role,phone});
   localStorage.setItem('sobukhazi_users',JSON.stringify(users));
   document.getElementById('addUserRes').textContent='Saving '+name+' as '+role+'...';
   renderUsersList();
   try{
-    await fetch('/api/portal/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',email,password_plain:pass,role,name,created_by:currentUser.email})});
+    await fetch('/api/portal/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',email,password:pass,phone,role,name,created_by:currentUser.email})});
   }catch(e){}
-  fetch('/api/memories',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_name:'admin',memory_type:'user_added',title:'User added: '+name+' '+role,content:'Email '+email+' Role '+role+' Added by '+currentUser.email,metadata:{project_slug:'sobukhazi-high-school'}})});
-  document.getElementById('addUserRes').textContent='✅ Added '+name+' as '+role+' • Email: '+email+' • Login works now';
-  document.getElementById('newName').value=''; document.getElementById('newEmail').value=''; document.getElementById('newPass').value='';
+  fetch('/api/memories',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_name:'admin',memory_type:'user_added',title:'User added: '+name+' '+role,content:'Email '+email+' Role '+role+' Phone '+phone+' Added by '+currentUser.email,metadata:{project_slug:'sobukhazi-high-school'}})});
+  document.getElementById('addUserRes').textContent='✅ Added '+name+' as '+role+' • Email: '+email+' • Phone: '+(phone||'none')+' • WhatsApp '+(phone?'enabled':'add phone to enable')+' • Login works now';
+  document.getElementById('newName').value=''; document.getElementById('newEmail').value=''; document.getElementById('newPass').value=''; if(document.getElementById('newPhone')) document.getElementById('newPhone').value='';
 }
 function removeUser(email){
   if(email==='harold@schoolstack'){alert('Cannot remove maintainer');return;}
