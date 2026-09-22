@@ -1,147 +1,189 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Sobukhazi Portal — $1200 Advanced + Late Auto-Notify + AI</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sobukhazi High School Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--slate:#1A0F0A;--line:#E7E5E4;--amber:#F59E0B;--bg:#F8FAFC}
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,sans-serif;background:var(--bg);color:#292524}
-.nav{height:60px;background:var(--slate);color:white;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
-.card{background:white;border:1px solid var(--line);border-radius:14px;padding:16px}
-.btn{padding:8px 14px;border-radius:999px;border:0;background:var(--slate);color:white;font-weight:600;cursor:pointer;font-size:13px}
-.btn-amber{background:var(--amber);color:var(--slate)}
-.input{padding:8px 10px;border-radius:8px;border:1px solid var(--line);font-size:13px}
-.badge{padding:3px 8px;border-radius:999px;font-size:10px;font-weight:700}
-.grid{display:grid;grid-template-columns:220px 1fr 320px;min-height:calc(100vh - 60px)}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
+:root{--maroon:#7F1D1D;--slate:#1C1917;--line:#E7E5E4;--bg:#F5F5F4;--muted:#78716C;--green:#16A34A;--amber:#B45309}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:#1C1917;font-size:14px;line-height:1.6}
+.top{height:56px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:20}
+.card{background:white;border:1px solid var(--line);border-radius:12px;padding:16px}
+.btn{padding:8px 14px;border-radius:8px;border:0;background:var(--slate);color:white;font-weight:600;cursor:pointer;font-size:13px}
+.btn-maroon{background:var(--maroon);color:white}
+.input,select{padding:8px 10px;border-radius:8px;border:1px solid var(--line);font-size:13px;background:white;width:100%}
+.badge{padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 56px)}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.side{display:none}.mobile-tabs{display:flex!important}}
 .side{background:white;border-right:1px solid var(--line);padding:16px}
-</style></head><body>
-<div class="nav">
-<div style="display:flex;gap:10px;align-items:center"><div style="width:32px;height:32px;border-radius:8px;background:white;color:var(--slate);display:grid;place-items:center;font-weight:800">S</div><b>Sobukhazi Portal</b><span style="background:rgba(255,255,255,.15);padding:4px 8px;border-radius:999px;font-size:11px">$1200 Advanced • Late Auto-Notify • AI</span><span style="background:var(--amber);color:var(--slate);padding:4px 8px;border-radius:999px;font-size:11px">Supabase Persistent</span></div>
-<div style="display:flex;gap:8px;align-items:center"><span style="font-size:12px;opacity:.8">Mr Ncube • Teacher • 5B</span><div style="width:28px;height:28px;border-radius:999px;background:var(--amber)"></div></div>
-</div>
-<div class="grid">
-<div class="side">
-<div style="font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#78716C;margin-bottom:10px">Class 5B • Today</div>
-<div id="studentList" style="display:grid;gap:6px"></div>
-<div style="margin-top:20px;display:grid;gap:6px;font-size:13px">
-<div style="background:var(--slate);color:white;padding:10px 12px;border-radius:10px;font-weight:600">⏰ Late Arrival</div>
-<div style="padding:8px 12px">✓ Attendance</div>
-<div style="padding:8px 12px">📊 Results (Excel upload)</div>
-<div style="padding:8px 12px">💰 Fees RTGS/USD</div>
-<div style="padding:8px 12px">💬 Messages</div>
-<div style="padding:8px 12px">🤖 AI Assistant</div>
-</div>
-<div style="margin-top:20px;padding:12px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;font-size:11px"><b>⚡ Advanced but low workload</b><br>One-tap late + time, bulk results Excel, voice homework → text, auto parent SMS. No extra work.</div>
-</div>
-<div style="padding:20px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h2 style="font-size:22px">Late Arrival — Mark + Auto Notify Parent</h2><div style="display:flex;gap:8px"><span class="badge" style="background:#DCFCE7;color:#166534">Real system</span><span class="badge" style="background:#FEF3C7;color:#92400E">Teacher: 10 sec</span></div></div>
+.mobile-tabs{display:none;gap:8px;padding:12px 16px;background:white;border-bottom:1px solid var(--line);overflow:auto}
+.tab{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:white;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer}
+.tab.active{background:var(--slate);color:white;border-color:var(--slate)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.grid-2{grid-template-columns:1fr}}
+.list{display:grid;gap:8px;max-height:320px;overflow:auto}
+.item{padding:10px;border:1px solid var(--line);border-radius:10px;background:white;display:flex;justify-content:space-between;align-items:center}
+</style>
+</head>
+<body>
 
-<div class="card" style="margin-bottom:16px;background:#FFFBEB;border-color:#FDE68A">
-<div style="font-weight:700;margin-bottom:10px">Mark Late Arrival — Teacher (10 seconds)</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end">
-<div><div style="font-size:11px;font-weight:700;color:#57534E;margin-bottom:4px">Student</div><select id="lateStudent" class="input" style="width:100%"><option>Tariro Dube</option><option>Kudzai Dube</option><option>Mzi Ncube</option><option>Methembe Tshuma</option><option>Alpha Mpofu</option></select></div>
-<div><div style="font-size:11px;font-weight:700;color:#57534E;margin-bottom:4px">Class</div><select id="lateClass" class="input" style="width:100%"><option>5B</option><option>2A</option><option>Form 3</option><option>Form 4</option></select></div>
-<div><div style="font-size:11px;font-weight:700;color:#57534E;margin-bottom:4px">Arrival Time</div><input id="lateTime" type="time" class="input" style="width:100%"></div>
-<div><div style="font-size:11px;font-weight:700;color:#57534E;margin-bottom:4px">Reason</div><select id="lateReason" class="input" style="width:100%"><option value="traffic">traffic</option><option value="transport">transport</option><option value="illness">illness</option><option value="family">family</option><option value="overslept">overslept</option><option value="other">other</option></select></div>
-<div><button onclick="markLate()" class="btn" style="padding:10px 16px">Save + Notify Parent →</button></div>
+<div class="top">
+<div style="display:flex;align-items:center;gap:10px">
+<img src="assets/logo-clean.png" alt="Sobukhazi Logo" style="width:36px;height:36px;object-fit:contain;border-radius:8px;border:1px solid var(--line);background:white">
+<div><div style="font-weight:700;font-size:14px;line-height:1">Sobukhazi High School</div><div style="font-size:11px;color:var(--muted)">Portal • Old Fall Rd, Mzilikazi</div></div>
 </div>
-<div style="display:flex;gap:8px;margin-top:10px"><input id="lateDetails" class="input" placeholder="Details e.g. Kumalo road traffic, bus delayed" style="flex:1"><input id="markedBy" class="input" placeholder="Teacher e.g. Mr Ncube" value="Mr Ncube" style="width:140px"></div>
-<div style="font-size:11px;color:#92400E;margin-top:8px">⏰ Time auto-fills with current time, editable. Parent gets auto SMS/WhatsApp/portal instantly with time + reason + teacher name. No manual messaging.</div>
+<div style="display:flex;gap:8px;align-items:center">
+<span class="badge" style="background:#FEF3C7;color:#92400E">Teacher • Mr Ncube</span>
+<span class="badge" style="background:#DCFCE7;color:#166534">5B • Today</span>
+<div style="width:28px;height:28px;border-radius:999px;background:var(--line)"></div>
+</div>
+</div>
+
+<div class="mobile-tabs">
+<div class="tab active" onclick="showTab('late')">Late Arrival</div>
+<div class="tab" onclick="showTab('attendance')">Attendance</div>
+<div class="tab" onclick="showTab('results')">Results</div>
+<div class="tab" onclick="showTab('notifs')">Parent Msgs</div>
+</div>
+
+<div class="layout">
+<div class="side">
+<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Class 5B • 32 Students</div>
+<div id="students" style="display:grid;gap:6px"></div>
+<div style="margin-top:20px">
+<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Menu</div>
+<div style="display:grid;gap:4px">
+<div id="tab-late" class="tab active" style="border:0;text-align:left;padding:10px 12px" onclick="showTab('late')">⏰ Late Arrival</div>
+<div id="tab-attendance" class="tab" style="border:0;text-align:left;padding:10px 12px" onclick="showTab('attendance')">✓ Attendance</div>
+<div id="tab-results" class="tab" style="border:0;text-align:left;padding:10px 12px" onclick="showTab('results')">📊 Results</div>
+<div id="tab-notifs" class="tab" style="border:0;text-align:left;padding:10px 12px" onclick="showTab('notifs')">💬 Parent Notifications</div>
+</div>
+</div>
+</div>
+
+<div style="padding:16px">
+<!-- LATE ARRIVAL TAB -->
+<div id="view-late">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+<h2 style="font-size:18px">Late Arrivals</h2>
+<div style="display:flex;gap:6px"><span class="badge" style="background:var(--slate);color:white">Real • Works</span><span class="badge" style="background:#F5F5F4;border:1px solid var(--line)">10 sec to mark</span></div>
+</div>
+
+<div class="card" style="margin-bottom:12px">
+<div style="font-weight:600;margin-bottom:12px">Mark student late</div>
+<div style="display:grid;grid-template-columns:1.2fr .8fr .8fr 1fr auto;gap:8px;align-items:end">
+<div><div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px">Student</div><select id="lateStudent" class="input"><option>Tariro Dube</option><option>Kudzai Dube</option><option>Mzi Ncube</option><option>Methembe Tshuma</option><option>Alpha Mpofu</option><option>Student 001</option><option>Student 002</option></select></div>
+<div><div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px">Time arrived</div><input id="lateTime" type="time" class="input"></div>
+<div><div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px">Reason</div><select id="lateReason" class="input"><option value="traffic">traffic</option><option value="transport">transport</option><option value="illness">illness</option><option value="family">family</option><option value="overslept">overslept</option><option value="other">other</option></select></div>
+<div><div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px">Details (optional)</div><input id="lateDetails" class="input" placeholder="Kumalo road traffic"></div>
+<div><button onclick="markLate()" class="btn btn-maroon" style="padding:10px 16px;white-space:nowrap">Save + Notify</button></div>
+</div>
+<div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+<input id="markedBy" class="input" value="Mr Ncube" style="max-width:140px" placeholder="Teacher name">
+<span style="font-size:11px;color:var(--muted)">Time auto-fills now, editable. Parent gets portal + SMS instantly.</span>
+</div>
 <div id="lateResult" style="margin-top:10px;font-size:13px"></div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>Today's Late Arrivals</b><button onclick="loadLates()" style="padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:white;font-size:11px">Refresh</button></div><div id="lateList" style="display:grid;gap:8px;max-height:300px;overflow:auto"></div></div>
-<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>Parent Notifications Sent (Auto)</b><button onclick="loadNotifs()" style="padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:white;font-size:11px">Refresh</button></div><div id="notifList" style="display:grid;gap:8px;max-height:300px;overflow:auto"></div></div>
+<div class="grid-2">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>Today • Late</b><button onclick="loadLates()" class="btn" style="padding:4px 8px;font-size:11px;background:white;color:var(--slate);border:1px solid var(--line)">Refresh</button></div>
+<div id="lateList" class="list"></div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>Parent notifications • Auto sent</b><button onclick="loadNotifs()" class="btn" style="padding:4px 8px;font-size:11px;background:white;color:var(--slate);border:1px solid var(--line)">Refresh</button></div>
+<div id="notifList" class="list"></div>
+</div>
+</div>
 </div>
 
-<div class="card" style="background:#1A0F0A;color:white">
-<div style="display:flex;justify-content:space-between;align-items:center"><b style="color:white">How late auto-notify works — highly advanced, low teacher work</b><span class="badge" style="background:var(--amber);color:var(--slate)">Real System</span></div>
-<div style="margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-size:12px">
-<div><b style="color:var(--amber)">1. Teacher</b><div style="opacity:.8;margin-top:4px">One-tap Late + time auto-fills + reason dropdown → Save. 10 sec.</div></div>
-<div><b style="color:var(--amber)">2. System</b><div style="opacity:.8;margin-top:4px">Saves to late_arrivals table, creates parent_notifications, marks notified_parent=true, sent_at=now()</div></div>
-<div><b style="color:var(--amber)">3. Parent</b><div style="opacity:.8;margin-top:4px">Instant portal bell + SMS + WhatsApp with time, reason, teacher. No teacher action.</div></div>
-<div><b style="color:var(--amber)">4. Learning</b><div style="opacity:.8;margin-top:4px">Stores as persistent memory, pattern detection (chronic late), Hermes skill improves.</div></div>
-</div>
-</div>
-</div>
-<div style="padding:20px;background:white;border-left:1px solid var(--line)">
-<div style="font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#78716C;margin-bottom:12px">AI Assistant + Portal Features</div>
-
-<div class="card" style="margin-bottom:12px;background:#FFFBEB;border-color:#FDE68A">
-<b style="font-size:13px">🤖 AI Assistant (on website + portal)</b>
-<div style="font-size:11px;color:#57534E;margin:8px 0">Answers parent questions 24/7: "What does Sobukhazi mean?" "Where is school?" "How does late system work?" Trained on heritage + portal, searches live web + memory.</div>
-<div style="display:flex;gap:6px"><input id="aiQ" class="input" placeholder="Ask AI..." style="font-size:12px"><button onclick="askAI()" class="btn" style="padding:6px 10px;font-size:11px">Ask</button></div>
-<div id="aiAns" style="font-size:11px;color:#57534E;margin-top:8px;max-height:120px;overflow:auto"></div>
-</div>
-
+<!-- ATTENDANCE TAB -->
+<div id="view-attendance" style="display:none">
+<h2 style="font-size:18px;margin-bottom:12px">Attendance • 5B</h2>
 <div class="card" style="margin-bottom:12px">
-<b style="font-size:13px">📊 Advanced but Low Workload</b>
-<div style="font-size:11px;color:#57534E;margin-top:8px;display:grid;gap:6px">
-<div>✓ <b>Attendance:</b> Mark all present → untick 2 absent (15 sec)</div>
-<div>✓ <b>Results:</b> Upload Excel/CSV → auto grades + AI comments (70% less typing)</div>
-<div>✓ <b>Homework:</b> Voice note → auto text + send to parents</div>
-<div>✓ <b>Fees:</b> Auto invoices RTGS/USD, EcoCash auto reconciled, receipts auto</div>
-<div>✓ <b>Late:</b> One-tap + time + reason → parent auto SMS (10 sec)</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b>Mark all present → untick absent (15 sec)</b><button class="btn" style="background:white;color:var(--slate);border:1px solid var(--line)">Mark all present</button></div>
+<div id="attList" style="display:grid;gap:6px"></div>
+<div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-maroon">Save attendance</button><span style="font-size:11px;color:var(--muted)">Parents of absent get auto SMS</span></div>
 </div>
 </div>
 
-<div class="card" style="margin-bottom:12px">
-<b style="font-size:13px">🔒 Security + Persistent Memory</b>
-<div style="font-size:11px;color:#57534E;margin-top:8px">
-• RLS: parent sees only own child late<br>
-• Audit: who marked, when, device<br>
-• Persistent: Supabase late_arrivals + parent_notifications, survives restart<br>
-• Hermes: learns from mistakes, improves
+<!-- RESULTS TAB -->
+<div id="view-results" style="display:none">
+<h2 style="font-size:18px;margin-bottom:12px">Results • Excel upload (70% less typing)</h2>
+<div class="card">
+<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap"><input type="file" class="input" style="max-width:200px"><button class="btn btn-maroon">Upload Excel/CSV</button><span style="font-size:11px;color:var(--muted)">Upload existing mark sheet → auto grades + AI comments</span></div>
+<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:8px 12px;background:#FAFAF9;font-size:11px;font-weight:700;color:var(--muted)"><span>Student</span><span>Math</span><span>English</span><span>Comment (AI suggested)</span></div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:8px 12px;border-top:1px solid var(--line);font-size:12px"><span>Tariro Dube</span><span>92% A</span><span>88% A</span><span style="color:var(--muted)">Excels in Math, good English</span></div>
+<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:8px 12px;border-top:1px solid var(--line);font-size:12px"><span>Kudzai Dube</span><span>78% B</span><span>81% B</span><span style="color:var(--muted)">Steady progress</span></div>
+</div>
 </div>
 </div>
 
-<div class="card" style="background:var(--slate);color:white">
-<b style="color:white;font-size:13px">Test Late System Now</b>
-<div style="font-size:11px;opacity:.8;margin-top:6px">1. Select student + time + reason above<br>2. Click Save + Notify Parent<br>3. See it appear in Today's Lates + Parent Notifications instantly<br>4. Check Supabase: late_arrivals table persistent</div>
+<!-- NOTIFS TAB -->
+<div id="view-notifs" style="display:none">
+<h2 style="font-size:18px;margin-bottom:12px">Parent Notifications</h2>
+<div id="notifList2" class="list"></div>
 </div>
+
 </div>
 </div>
 
 <script>
-function setNowTime(){ const now=new Date(); document.getElementById('lateTime').value=now.toTimeString().slice(0,5); }
-setNowTime();
-const students=['Tariro Dube','Kudzai Dube','Mzi Ncube','Methembe Tshuma','Alpha Mpofu','Student_001','Student_002'];
-document.getElementById('studentList').innerHTML=students.map(s=>`<div style="padding:8px;border:1px solid var(--line);border-radius:8px;background:white;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">${s}</span><span style="font-size:10px;background:#DCFCE7;padding:2px 6px;border-radius:999px">✓ Present</span></div>`).join('');
+function setNow(){ const n=new Date(); document.getElementById('lateTime').value=n.toTimeString().slice(0,5); }
+setNow();
+const studs=['Tariro Dube','Kudzai Dube','Mzi Ncube','Methembe Tshuma','Alpha Mpofu','Student 001','Student 002','Student 003'];
+document.getElementById('students').innerHTML=studs.map(s=>`<div style="padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:white;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">${s}</span><span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 6px;border-radius:999px">Present</span></div>`).join('');
+document.getElementById('attList').innerHTML=studs.map(s=>`<div style="padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:white;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px">${s}</span><div style="display:flex;gap:4px"><button style="padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:white;font-size:11px">Present</button><button style="padding:4px 8px;border-radius:999px;border:1px solid #FDE68A;background:#FFFBEB;font-size:11px">Late</button><button style="padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:white;font-size:11px">Absent</button></div></div>`).join('');
+
+function showTab(t){
+  ['late','attendance','results','notifs'].forEach(k=>{
+    document.getElementById('view-'+k).style.display=k===t?'block':'none';
+    const el=document.getElementById('tab-'+k); if(el){ el.classList.toggle('active',k===t); }
+  });
+  document.querySelectorAll('.mobile-tabs .tab').forEach(el=>{
+    el.classList.toggle('active', el.textContent.toLowerCase().includes(t==='late'?'late':t));
+  });
+}
 
 async function markLate(){
   const student_name=document.getElementById('lateStudent').value;
-  const class_name=document.getElementById('lateClass').value;
+  const class_name=document.getElementById('lateClass')?.value||'5B';
+  const classEl=document.getElementById('lateClass'); const cname=classEl?classEl.value:'5B';
   const arrival_time=document.getElementById('lateTime').value;
   const reason=document.getElementById('lateReason').value;
   const reason_details=document.getElementById('lateDetails').value;
   const marked_by_name=document.getElementById('markedBy').value||'Mr Ncube';
-  document.getElementById('lateResult').textContent='⏰ Marking late + auto notifying parent...';
+  document.getElementById('lateResult').textContent='Saving + notifying parent...';
   try{
-    const r=await fetch('/api/attendance/late',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name,class_name,arrival_time,reason,reason_details,marked_by_name,location:'Mzilikazi, Bulawayo'})});
+    const r=await fetch('/api/attendance/late',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name,class_name:cname,arrival_time,reason,reason_details,marked_by_name,location:'Mzilikazi'})});
     const j=await r.json();
-    if(j.error){ document.getElementById('lateResult').textContent='Error: '+j.error; return; }
-    document.getElementById('lateResult').innerHTML=`✅ ${j.message}<br><small>Notification: ${j.notification?.title||''} • Sent via ${j.notification?.channel?.join(',')||'portal+sms'}</small>`;
+    if(j.error){ document.getElementById('lateResult').textContent='Error: '+j.error+' — run late_arrivals.sql in Supabase'; return; }
+    document.getElementById('lateResult').innerHTML=`✅ ${j.message}<br><small style="color:#57534E">${j.notification?.title||''} • ${j.notification?.channel?.join(', ')||'portal+sms'} at ${new Date(j.notification?.sent_at||Date.now()).toLocaleTimeString()}</small>`;
     loadLates(); loadNotifs();
-    setNowTime();
+    setNow();
   }catch(e){ document.getElementById('lateResult').textContent='Error: '+e.message; }
 }
 async function loadLates(){
-  const r=await fetch('/api/attendance/late?limit=20');const data=await r.json();
-  document.getElementById('lateList').innerHTML=data.map(l=>`<div style="padding:8px;border:1px solid var(--line);border-radius:8px;background:white"><div style="display:flex;justify-content:space-between"><b style="font-size:11px">${l.student_name} • ${l.class_name}</b><span style="font-size:10px;background:#FEF3C7;padding:2px 6px;border-radius:999px">${l.arrival_time?.slice(0,5)} • ${l.reason}</span></div><div style="font-size:10px;color:#78716C">${l.date} • ${l.reason_details||''} • By ${l.marked_by_name} • ${l.notified_parent?'Notified ✓':''}</div></div>`).join('')||'<div style="font-size:11px;color:#78716C">No lates today</div>';
+  try{
+    const r=await fetch('/api/attendance/late?limit=20');const data=await r.json();
+    if(data.error){ document.getElementById('lateList').innerHTML=`<div style="font-size:11px;color:#991B1B">Run late_arrivals.sql in Supabase SQL Editor to enable: ${data.error}</div>`; return; }
+    document.getElementById('lateList').innerHTML=data.map(l=>`<div class="item"><div><b style="font-size:12px">${l.student_name} • ${l.class_name}</b><div style="font-size:11px;color:var(--muted)">${l.date} ${l.arrival_time?.slice(0,5)} • ${l.reason} ${l.reason_details?`(${l.reason_details})`:''} • By ${l.marked_by_name}</div></div><span class="badge" style="background:${l.notified_parent?'#DCFCE7':'#FEF3C7'};color:${l.notified_parent?'#166534':'#92400E'}">${l.notified_parent?'Notified ✓':'Pending'}</span></div>`).join('')||'<div style="font-size:12px;color:var(--muted)">No lates today</div>';
+  }catch(e){ document.getElementById('lateList').textContent='Error: '+e.message; }
 }
 async function loadNotifs(){
-  const r=await fetch('/api/notifications?type=late_arrival&limit=20');const data=await r.json();
-  document.getElementById('notifList').innerHTML=data.map(n=>`<div style="padding:8px;border:1px solid #BBF7D0;background:#F0FDF4;border-radius:8px"><div style="font-weight:700;font-size:11px">${n.title}</div><div style="font-size:10px;color:#475569;margin-top:2px">${n.message.slice(0,120)}...</div><div style="font-size:9px;color:#16A34A;margin-top:4px">${new Date(n.sent_at).toLocaleTimeString()} • ${n.channel?.join(',')} • ${n.read?'Read':'New'}</div></div>`).join('')||'<div style="font-size:11px;color:#78716C">No notifications</div>';
-}
-async function askAI(){
-  const q=document.getElementById('aiQ').value.trim();if(!q)return;
-  document.getElementById('aiAns').textContent='🧠 Asking AI...';
   try{
-    const r=await fetch('/api/brain/query',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,project_slug:'sobukhazi-high-school',browse:true})});
-    const j=await r.json();
-    document.getElementById('aiAns').innerHTML=`${(j.answer||'').slice(0,400)}<br><small style="color:#78716C">Memories: ${j.memories?.length||0} • Web: ${j.webResults?.length||0}</small>`;
-  }catch(e){ document.getElementById('aiAns').textContent='Error: '+e.message; }
+    const r=await fetch('/api/notifications?type=late_arrival&limit=20');const data=await r.json();
+    if(data.error){ document.getElementById('notifList').innerHTML=`<div style="font-size:11px;color:#991B1B">Run late_arrivals.sql: ${data.error}</div>`; document.getElementById('notifList2').innerHTML=document.getElementById('notifList').innerHTML; return; }
+    const html=data.map(n=>`<div style="padding:10px;border:1px solid #BBF7D0;background:#F0FDF4;border-radius:10px"><div style="font-weight:600;font-size:12px">${n.title}</div><div style="font-size:11px;color:#475569;margin-top:2px">${n.message.slice(0,140)}...</div><div style="font-size:10px;color:#16A34A;margin-top:4px">${new Date(n.sent_at).toLocaleString()} • ${n.channel?.join(', ')} • ${n.read?'Read':'New'}</div></div>`).join('')||'<div style="font-size:12px;color:var(--muted)">No notifications</div>';
+    document.getElementById('notifList').innerHTML=html;
+    const el2=document.getElementById('notifList2'); if(el2) el2.innerHTML=html;
+  }catch(e){ document.getElementById('notifList').textContent='Error: '+e.message; }
 }
 loadLates(); loadNotifs();
-setInterval(()=>{ loadLates(); loadNotifs(); },10000);
+setInterval(()=>{ loadLates(); loadNotifs(); },12000);
 </script>
-</body></html>
+</body>
+</html>
