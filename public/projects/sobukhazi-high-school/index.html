@@ -40,10 +40,10 @@ h1,h2,h3{font-family:Fraunces,serif;color:var(--slate);letter-spacing:-.02em}
 .fac-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 @media(max-width:800px){.fac-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:500px){.fac-grid{grid-template-columns:1fr}}
-#ai-widget{position:fixed;bottom:20px;right:20px;z-index:100}
+#ai-widget{position:fixed;bottom:20px;right:20px;z-index:100;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 #ai-btn{width:58px;height:58px;border-radius:999px;background:var(--green);color:white;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.25);border:2px solid white;font-size:24px;transition:.2s}
 #ai-btn:hover{transform:scale(1.05)}
-#ai-panel{position:absolute;bottom:74px;right:0;width:390px;max-width:92vw;height:540px;background:white;border-radius:18px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.28);display:none;flex-direction:column;overflow:hidden}
+#ai-panel{position:absolute;bottom:74px;right:0;width:400px;max-width:94vw;height:560px;background:white;border-radius:18px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.28);display:none;flex-direction:column;overflow:hidden}
 #ai-panel.open{display:flex}
 #ai-header{height:56px;background:linear-gradient(135deg, var(--slate) 0%, #2D2A26 100%);color:white;display:flex;align-items:center;justify-content:space-between;padding:0 16px}
 #ai-msgs{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#FAFAF9}
@@ -135,6 +135,40 @@ img{max-width:100%}
 <img src="assets/hero-real-800.jpg" alt="Sobukhazi High School entrance Old Fall Road">
 </div>
 <div style="margin-top:10px;display:flex;gap:8px;font-size:11px;color:#BBF7D0"><span>📍 Old Fall Rd, Mzilikazi</span><span>•</span><span>📞 09200581</span><span>•</span><span>Public • Reigate</span></div>
+</div>
+</div>
+</div>
+</section>
+
+
+<section id="ai-inline" style="padding:28px 0;background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-bottom:1px solid #86EFAC">
+<div class="container">
+<div style="display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:center" class="hero-grid">
+<div>
+<div class="kicker">AI Assistant • Intelligent • Not Chatbot</div>
+<h2 style="font-size:28px;line-height:.95;margin-bottom:10px">Ask anything about Sobukhazi<br><span style="color:var(--green)">Heritage, Portal, Admissions</span></h2>
+<p style="font-size:14px;color:#57534E;margin-bottom:14px">I'm not a chatbot — I know our school deeply: <b>bakhazimula</b> heritage, So-bu-kha-zi pronunciation, 54 medals, Old Fall Rd, portal 4 roles, late auto-notify + WhatsApp, Facebook group. Try me.</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+<span class="suggestion" onclick="document.getElementById('ai-panel').classList.add('open'); quickAsk('Explain bakhazimula deeply and why green uniform?')">Heritage deep dive</span>
+<span class="suggestion" onclick="document.getElementById('ai-panel').classList.add('open'); quickAsk('How do I login as admin and post announcement with picture?')">Post announcement</span>
+<span class="suggestion" onclick="document.getElementById('ai-panel').classList.add('open'); quickAsk('How does late arrival WhatsApp work?')">Late + WhatsApp</span>
+<span class="suggestion" onclick="document.getElementById('ai-panel').classList.add('open'); quickAsk('Facebook group link')">Facebook group</span>
+</div>
+<div style="display:flex;gap:10px">
+<button onclick="toggleAI()" class="btn btn-green">💬 Open AI Assistant</button>
+<a href="portal.html" class="btn btn-line">Portal Login →</a>
+</div>
+</div>
+<div class="card" style="padding:0;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08)">
+<div style="padding:12px 16px;background:var(--slate);color:white;display:flex;justify-content:space-between;align-items:center">
+<div style="display:flex;gap:8px;align-items:center"><div style="width:28px;height:28px;background:white;border-radius:6px;display:grid;place-items:center">💬</div><div><div style="font-weight:700;font-size:13px">Sobukhazi Assistant</div><div style="font-size:10px;opacity:.7">Intelligent • Online</div></div></div>
+<span style="background:#22C55E;width:8px;height:8px;border-radius:999px;display:inline-block"></span>
+</div>
+<div style="padding:16px;display:grid;gap:10px">
+<div class="ai-m b" style="max-width:100%;font-size:13px">Sawubona! I'm your intelligent assistant. I know heritage <b>bakhazimula</b>, portal logins, late + WhatsApp, Facebook group. What do you want to know?</div>
+<div style="display:flex;gap:8px"><input id="ai-inline-input" placeholder="Ask anything..." class="input" style="flex:1" onkeydown="if(event.key==='Enter'){document.getElementById('ai-input').value=this.value; toggleAI(); document.getElementById('ai-panel').classList.add('open'); askAI();}"><button onclick="document.getElementById('ai-input').value=document.getElementById('ai-inline-input').value; toggleAI(); document.getElementById('ai-panel').classList.add('open'); askAI();" class="btn btn-green" style="padding:10px 16px">Ask</button></div>
+<div style="font-size:11px;color:var(--muted)">Try: "How to add new teacher as maintainer?" or "Facebook group link" or "My credentials"</div>
+</div>
 </div>
 </div>
 </div>
@@ -275,7 +309,7 @@ img{max-width:100%}
 <div id="ai-msgs"></div>
 <div id="ai-row"><input id="ai-input" placeholder="Ask anything about Sobukhazi..." onkeydown="if(event.key==='Enter')askAI()"><button onclick="askAI()" id="ai-send" style="padding:11px 18px;border-radius:999px;background:var(--green);color:white;border:0;font-weight:800;cursor:pointer;font-size:13px">Send</button></div>
 </div>
-<div id="ai-btn" onclick="toggleAI()">💬</div>
+<div id="ai-btn" onclick="toggleAI()" style="width:auto;padding:12px 18px;gap:8px;display:flex;align-items:center;font-size:14px;font-weight:800"><span style="font-size:20px">💬</span> <span>Ask AI</span></div>
 </div>
 
 <script>

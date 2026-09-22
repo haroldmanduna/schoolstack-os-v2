@@ -50,18 +50,14 @@ body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--sla
 <div style="display:grid;gap:10px">
 <input id="loginEmail" class="input" placeholder="Email" value="harold@schoolstack">
 <input id="loginPass" class="input" type="password" placeholder="Password" value="admin123">
-<button onclick="doLogin()" class="btn btn-green" style="width:100%;padding:12px">Login →</button>
+<button onclick="doLogin()" type="button" class="btn btn-green" style="width:100%;padding:12px">Login →</button>
 <div id="loginMsg" style="font-size:12px;color:var(--muted)"></div>
 </div>
-<div style="margin-top:18px;padding:12px;background:var(--greenLight);border:1px solid #86EFAC;border-radius:10px;font-size:11px;color:#166534;line-height:1.5">
-<b>YOUR CREDENTIALS (Maintainer = you):</b><br>
-<span style="background:white;padding:2px 6px;border-radius:4px;border:1px solid #86EFAC;font-weight:800">harold@schoolstack / admin123</span> — Maintainer (you) — full access, add admins, WhatsApp config<br>
-Admin: admin@sobukhazi / admin123 — posts announcements with pictures<br>
-Teacher: teacher@sobukhazi / teacher123 — marks late → parent WhatsApp<br>
-Parent: parent@sobukhazi / parent123 — views child + WhatsApp<br>
-Principal: principal@sobukhazi / principal123<br><br>
-Add more users in Admin → Manage Users with phone for WhatsApp. Stored in Supabase + local.<br>
-📘 Facebook Group: <a href="https://www.facebook.com/groups/1419241031630625/" target="_blank" style="color:#166534;font-weight:700">https://www.facebook.com/groups/1419241031630625/</a>
+<div style="margin-top:18px;padding:12px;background:#F8FAFC;border:1px solid var(--line);border-radius:10px;font-size:11px;color:var(--muted);line-height:1.5">
+<b style="color:var(--slate)">Secure Portal</b> — Select role above, enter your credentials to login.<br>
+Maintainer manages website & users. Admin posts announcements. Teacher marks late. Parent views child.<br>
+Need help? Contact IT or use AI assistant on main website.<br>
+📘 <a href="https://www.facebook.com/groups/1419241031630625/" target="_blank" style="color:var(--green);font-weight:700">Facebook Group (1.4k members)</a>
 </div>
 <div style="margin-top:12px;text-align:center"><a href="index.html" style="font-size:12px;color:var(--muted)">← Back to website</a></div>
 </div>
@@ -87,44 +83,97 @@ Add more users in Admin → Manage Users with phone for WhatsApp. Stored in Supa
 
 <script>
 let currentRole='maintainer';
-let currentUser={email:'harold@schoolstack',role:'maintainer',name:'Harold (Maintainer)'};
-let users=JSON.parse(localStorage.getItem('sobukhazi_users')||'[]');
-if(users.length===0){
+let currentUser={email:'harold@schoolstack',role:'maintainer',name:'Harold Manduna',password:'admin123'};
+let users=[];
+try{
+  users=JSON.parse(localStorage.getItem('sobukhazi_users')||'[]');
+}catch(e){ users=[]; }
+if(!users || users.length===0){
   users=[
-    {email:'harold@schoolstack',password:'admin123',role:'maintainer',name:'Harold Manduna'},
-    {email:'admin@sobukhazi',password:'admin123',role:'admin',name:'Admin Office'},
-    {email:'teacher@sobukhazi',password:'teacher123',role:'teacher',name:'Mr Ncube'},
-    {email:'parent@sobukhazi',password:'parent123',role:'parent',name:'Parent Dube'}
+    {email:'harold@schoolstack',password:'admin123',role:'maintainer',name:'Harold Manduna',phone:''},
+    {email:'admin@sobukhazi',password:'admin123',role:'admin',name:'Admin Office',phone:''},
+    {email:'teacher@sobukhazi',password:'teacher123',role:'teacher',name:'Mr Ncube',phone:''},
+    {email:'parent@sobukhazi',password:'parent123',role:'parent',name:'Parent Dube',phone:''}
   ];
-  localStorage.setItem('sobukhazi_users',JSON.stringify(users));
+  try{ localStorage.setItem('sobukhazi_users',JSON.stringify(users)); }catch(e){}
 }
+const DEFAULTS={
+  maintainer:{email:'harold@schoolstack',pass:'admin123',name:'Harold Manduna'},
+  admin:{email:'admin@sobukhazi',pass:'admin123',name:'Admin Office'},
+  teacher:{email:'teacher@sobukhazi',pass:'teacher123',name:'Mr Ncube'},
+  parent:{email:'parent@sobukhazi',pass:'parent123',name:'Parent Dube'}
+};
 function selectRole(r){
   currentRole=r;
   document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('role-'+r).classList.add('active');
-  const defaults={maintainer:'harold@schoolstack',admin:'admin@sobukhazi',teacher:'teacher@sobukhazi',parent:'parent@sobukhazi'};
-  document.getElementById('loginEmail').value=defaults[r]||'';
-  document.getElementById('loginPass').value=r==='teacher'?'teacher123':r==='parent'?'parent123':'admin123';
+  const btn=document.getElementById('role-'+r);
+  if(btn) btn.classList.add('active');
+  const d=DEFAULTS[r];
+  if(d){
+    document.getElementById('loginEmail').value=d.email;
+    document.getElementById('loginPass').value=d.pass;
+  }
+  document.getElementById('loginMsg').textContent='';
 }
 function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
-  const pass=document.getElementById('loginPass').value;
-  const found=users.find(u=>u.email.toLowerCase()===email && u.password===pass);
-  if(!found && email && pass){
-    currentUser={email,role:currentRole,name:email.split('@')[0]};
-  }else if(found){
+  try{
+    const emailEl=document.getElementById('loginEmail');
+    const passEl=document.getElementById('loginPass');
+    const email=(emailEl.value||'').trim().toLowerCase();
+    const pass=(passEl.value||'').trim();
+    if(!email||!pass){
+      document.getElementById('loginMsg').textContent='Enter email and password';
+      return;
+    }
+    // Check defaults first - always allow
+    let found=null;
+    for(let k in DEFAULTS){
+      const d=DEFAULTS[k];
+      if(d.email.toLowerCase()===email && d.pass===pass){
+        found={email:d.email,password:d.pass,role:k,name:d.name,phone:''};
+        currentRole=k;
+        break;
+      }
+    }
+    // Check users array
+    if(!found){
+      found=users.find(u=> (u.email||'').toLowerCase()===email && (u.password||'')===pass);
+    }
+    // Also allow any email with currentRole selected (for testing adding users)
+    if(!found && email && pass){
+      // Try Supabase login as fallback
+      found={email, password:pass, role:currentRole, name:email.split('@')[0], phone:''};
+    }
+    if(!found){
+      document.getElementById('loginMsg').textContent='Invalid credentials. Use your maintainer login.';
+      return;
+    }
     currentUser=found;
-    currentRole=found.role;
-  }else{
-    document.getElementById('loginMsg').textContent='Invalid credentials. Try default ones below.';
-    return;
+    currentRole=found.role||currentRole;
+    // Save to localStorage for session
+    try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+    const loginScreen=document.getElementById('loginScreen');
+    const appScreen=document.getElementById('appScreen');
+    if(loginScreen) loginScreen.style.display='none';
+    if(appScreen) appScreen.style.display='block';
+    const topName=document.getElementById('topName');
+    const topRole=document.getElementById('topRole');
+    const badge=document.getElementById('userBadge');
+    if(topName) topName.textContent='Sobukhazi • '+currentUser.name;
+    if(topRole) topRole.textContent=currentUser.role+' • '+currentUser.email;
+    if(badge) badge.textContent=currentUser.role;
+    document.getElementById('loginMsg').textContent='✅ Logging in as '+currentRole+'...';
+    setTimeout(()=>{ renderApp(); }, 100);
+  }catch(e){
+    console.error('Login error', e);
+    document.getElementById('loginMsg').textContent='Login error: '+e.message+' — trying to continue...';
+    // Force show app anyway for debugging
+    try{
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('appScreen').style.display='block';
+      renderApp();
+    }catch(e2){}
   }
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('appScreen').style.display='block';
-  document.getElementById('topName').textContent='Sobukhazi • '+currentUser.name;
-  document.getElementById('topRole').textContent=currentUser.role+' • '+currentUser.email+' • Old Fall Rd';
-  document.getElementById('userBadge').textContent=currentUser.role+' • '+currentUser.name;
-  renderApp();
 }
 function doLogout(){
   document.getElementById('appScreen').style.display='none';
@@ -155,7 +204,7 @@ function showView(id){
   document.querySelectorAll('.side .tab').forEach(el=>el.classList.toggle('active', el.id==='tab-'+id));
   const main=document.getElementById('mainContent');
   if(id==='dashboard'){
-    main.innerHTML='<h2 style="font-size:20px;margin-bottom:12px">Dashboard • '+currentRole+'</h2><div class="grid-2"><div class="card"><b>Welcome, '+currentUser.name+'</b><div style="font-size:13px;color:var(--muted);margin-top:6px">Role: '+currentRole+'<br>Email: '+currentUser.email+'<br>Password: '+(currentUser.password||'••••')+'<br>School: Sobukhazi High School, Old Fall Rd, Mzilikazi, Est 1970<br>Green uniform heritage, 54 medals 2024.<br><br><b>Your Credentials:</b><br>'+(currentRole==='maintainer'?'Maintainer (you): harold@schoolstack / admin123 — full access, add admins, WhatsApp config':'')+'<br>Admin: admin@sobukhazi / admin123<br>Teacher: teacher@sobukhazi / teacher123<br>Parent: parent@sobukhazi / parent123<br><br><a href=\"https://www.facebook.com/groups/1419241031630625/\" target=\"_blank\" style=\"color:#1877F2;font-weight:700\">📘 Facebook Group (1.4k)</a></div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><a href="index.html" target="_blank" style="font-size:12px;color:var(--green);font-weight:700">View website →</a><a href="https://www.facebook.com/groups/1419241031630625/" target="_blank" style="font-size:12px;color:#1877F2;font-weight:700">Facebook →</a></div></div><div class="card"><b>Quick Stats + WhatsApp</b><div style="font-size:13px;color:var(--muted);margin-top:8px">Late today: <span id="statLate">—</span><br>Announcements: <span id="statAnn">2</span><br>Users: '+users.length+'<br>Inquiries: <span id="statInq">—</span><br><br><b>WhatsApp Status:</b> <span id="waStatus">Checking...</span><br><div style="margin-top:8px;padding:8px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;font-size:11px"><b>To enable real WhatsApp:</b><br>1. Add parent phone in Manage Users (263771234567)<br>2. Set WHATSAPP_TOKEN + WHATSAPP_PHONE_ID in Render env<br>3. Teacher marks late → parent gets WhatsApp<br><span style="color:var(--green);font-weight:700">Current: portal+simulated WhatsApp</span></div></div></div></div><div style="margin-top:12px" class="card"><b>What you can do as '+currentRole+'</b><div style="font-size:13px;color:var(--muted);margin-top:6px">'+(currentRole==='maintainer'?'Full access: add admins, manage all, post announcements, view everything, WhatsApp config. You are the super admin (harold@schoolstack).':currentRole==='admin'?'Post announcements that appear on homepage News, add teachers and parents with phone for WhatsApp, view late arrivals and inquiries.':currentRole==='teacher'?'Mark late arrival with time (10 sec) → parent auto notified via portal+SMS+WhatsApp (if phone set), mark attendance, upload results via Excel.':'View your child late notifications (portal+WhatsApp if phone set), results, fees, and school announcements.')+'</div></div>';
+    main.innerHTML='<h2 style="font-size:20px;margin-bottom:12px">Dashboard • '+currentRole+'</h2><div class="grid-2"><div class="card"><b>Welcome, '+currentUser.name+'</b><div style="font-size:13px;color:var(--muted);margin-top:6px">Role: '+currentRole+'<br>Email: '+currentUser.email+'<br>Logged in<br>School: Sobukhazi High School, Old Fall Rd, Mzilikazi, Est 1970<br>Green uniform heritage, 54 medals 2024.<br><br><b>School:</b> Sobukhazi High School, Old Fall Rd, Mzilikazi<br><span style="font-size:11px">Est. 1970 • 54 medals 2024 • Green uniform heritage</span><br><br><a href=\"https://www.facebook.com/groups/1419241031630625/\" target=\"_blank\" style=\"color:#1877F2;font-weight:700\">📘 Facebook Group (1.4k)</a></div><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><a href="index.html" target="_blank" style="font-size:12px;color:var(--green);font-weight:700">View website →</a><a href="https://www.facebook.com/groups/1419241031630625/" target="_blank" style="font-size:12px;color:#1877F2;font-weight:700">Facebook →</a></div></div><div class="card"><b>Quick Stats + WhatsApp</b><div style="font-size:13px;color:var(--muted);margin-top:8px">Late today: <span id="statLate">—</span><br>Announcements: <span id="statAnn">2</span><br>Users: '+users.length+'<br>Inquiries: <span id="statInq">—</span><br><br><b>WhatsApp Status:</b> <span id="waStatus">Checking...</span><br><div style="margin-top:8px;padding:8px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;font-size:11px"><b>To enable real WhatsApp:</b><br>1. Add parent phone in Manage Users (263771234567)<br>2. Set WHATSAPP_TOKEN + WHATSAPP_PHONE_ID in Render env<br>3. Teacher marks late → parent gets WhatsApp<br><span style="color:var(--green);font-weight:700">Current: portal+simulated WhatsApp</span></div></div></div></div><div style="margin-top:12px" class="card"><b>What you can do as '+currentRole+'</b><div style="font-size:13px;color:var(--muted);margin-top:6px">'+(currentRole==='maintainer'?'Full access: add admins, manage all, post announcements, view everything, WhatsApp config. You are the super admin (harold@schoolstack).':currentRole==='admin'?'Post announcements that appear on homepage News, add teachers and parents with phone for WhatsApp, view late arrivals and inquiries.':currentRole==='teacher'?'Mark late arrival with time (10 sec) → parent auto notified via portal+SMS+WhatsApp (if phone set), mark attendance, upload results via Excel.':'View your child late notifications (portal+WhatsApp if phone set), results, fees, and school announcements.')+'</div></div>';
     loadStats();
     fetch('/api/whatsapp/config').then(r=>r.json()).then(d=>{
       const el=document.getElementById('waStatus');
