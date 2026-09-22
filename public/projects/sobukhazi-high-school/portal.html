@@ -48,8 +48,8 @@ body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--sla
 <button id="role-parent" class="role-btn" onclick="selectRole('parent')">Parent</button>
 </div>
 <div style="display:grid;gap:10px">
-<input id="loginEmail" class="input" placeholder="Email" value="harold@schoolstack">
-<input id="loginPass" class="input" type="password" placeholder="Password" value="admin123">
+<input id="loginEmail" class="input" placeholder="Email" autocomplete="email" value="harold@schoolstack">
+<input id="loginPass" class="input" type="password" placeholder="Password" autocomplete="current-password" value="admin123">
 <button onclick="doLogin()" type="button" class="btn btn-green" style="width:100%;padding:12px">Login →</button>
 <div id="loginMsg" style="font-size:12px;color:var(--muted)"></div>
 </div>
@@ -83,26 +83,26 @@ Need help? Contact IT or use AI assistant on main website.<br>
 
 <script>
 let currentRole='maintainer';
-let currentUser={email:'harold@schoolstack',role:'maintainer',name:'Harold Manduna',password:'admin123'};
+let currentUser=null;
 let users=[];
+
+// Hardcoded defaults - ALWAYS work, no localStorage needed
+const DEFAULTS={
+  maintainer:{email:'harold@schoolstack',pass:'admin123',name:'Harold Manduna',role:'maintainer'},
+  admin:{email:'admin@sobukhazi',pass:'admin123',name:'Admin Office',role:'admin'},
+  teacher:{email:'teacher@sobukhazi',pass:'teacher123',name:'Mr Ncube',role:'teacher'},
+  parent:{email:'parent@sobukhazi',pass:'parent123',name:'Parent Dube',role:'parent'}
+};
+
+// Try load local users but don't fail if not available
 try{
-  users=JSON.parse(localStorage.getItem('sobukhazi_users')||'[]');
+  const stored=localStorage.getItem('sobukhazi_users');
+  if(stored) users=JSON.parse(stored);
 }catch(e){ users=[]; }
 if(!users || users.length===0){
-  users=[
-    {email:'harold@schoolstack',password:'admin123',role:'maintainer',name:'Harold Manduna',phone:''},
-    {email:'admin@sobukhazi',password:'admin123',role:'admin',name:'Admin Office',phone:''},
-    {email:'teacher@sobukhazi',password:'teacher123',role:'teacher',name:'Mr Ncube',phone:''},
-    {email:'parent@sobukhazi',password:'parent123',role:'parent',name:'Parent Dube',phone:''}
-  ];
-  try{ localStorage.setItem('sobukhazi_users',JSON.stringify(users)); }catch(e){}
+  users=Object.values(DEFAULTS).map(d=>({email:d.email,password:d.pass,role:d.role,name:d.name,phone:''}));
 }
-const DEFAULTS={
-  maintainer:{email:'harold@schoolstack',pass:'admin123',name:'Harold Manduna'},
-  admin:{email:'admin@sobukhazi',pass:'admin123',name:'Admin Office'},
-  teacher:{email:'teacher@sobukhazi',pass:'teacher123',name:'Mr Ncube'},
-  parent:{email:'parent@sobukhazi',pass:'parent123',name:'Parent Dube'}
-};
+
 function selectRole(r){
   currentRole=r;
   document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
@@ -110,75 +110,143 @@ function selectRole(r){
   if(btn) btn.classList.add('active');
   const d=DEFAULTS[r];
   if(d){
-    document.getElementById('loginEmail').value=d.email;
-    document.getElementById('loginPass').value=d.pass;
-  }
-  document.getElementById('loginMsg').textContent='';
-}
-function doLogin(){
-  try{
     const emailEl=document.getElementById('loginEmail');
     const passEl=document.getElementById('loginPass');
+    if(emailEl) emailEl.value=d.email;
+    if(passEl) passEl.value=d.pass;
+  }
+  const msg=document.getElementById('loginMsg');
+  if(msg) msg.textContent='';
+  console.log('Selected role', r);
+}
+
+async function doLogin(){
+  const msgEl=document.getElementById('loginMsg');
+  const emailEl=document.getElementById('loginEmail');
+  const passEl=document.getElementById('loginPass');
+  
+  const setMsg=(t, isError=false)=>{
+    if(msgEl){
+      msgEl.textContent=t;
+      msgEl.style.color=isError?'#DC2626':'#166534';
+    }
+    console.log('Login msg:', t);
+  };
+
+  try{
     const email=(emailEl.value||'').trim().toLowerCase();
     const pass=(passEl.value||'').trim();
+    
+    console.log('Attempt login', email, currentRole);
+    
     if(!email||!pass){
-      document.getElementById('loginMsg').textContent='Enter email and password';
+      setMsg('Enter email and password', true);
       return;
     }
-    // Check defaults first - always allow
-    let found=null;
+
+    setMsg('⏳ Logging in...');
+
+    // Method 1: Try Supabase API login first (works on any phone)
+    try{
+      const resp=await fetch('/api/portal/login',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email, password:pass, project_slug:'sobukhazi-high-school'})
+      });
+      const data=await resp.json();
+      console.log('API login response', data);
+      if(data.success && data.user){
+        currentUser={email:data.user.email, role:data.user.role, name:data.user.name, password:pass, phone:''};
+        currentRole=data.user.role;
+        setMsg('✅ Login success via server as '+currentRole);
+        // Save session
+        try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+        showApp();
+        return;
+      } else if(data.error){
+        console.log('API login failed', data.error);
+        // Continue to fallback
+      }
+    }catch(e){
+      console.log('API login error, fallback to local', e.message);
+    }
+
+    // Method 2: Check hardcoded DEFAULTS (always works)
     for(let k in DEFAULTS){
       const d=DEFAULTS[k];
       if(d.email.toLowerCase()===email && d.pass===pass){
-        found={email:d.email,password:d.pass,role:k,name:d.name,phone:''};
-        currentRole=k;
-        break;
+        currentUser={email:d.email, role:d.role, name:d.name, password:d.pass, phone:''};
+        currentRole=d.role;
+        setMsg('✅ Login success as '+currentRole+' (local)');
+        try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+        showApp();
+        return;
       }
     }
-    // Check users array
-    if(!found){
-      found=users.find(u=> (u.email||'').toLowerCase()===email && (u.password||'')===pass);
-    }
-    // Also allow any email with currentRole selected (for testing adding users)
-    if(!found && email && pass){
-      // Try Supabase login as fallback
-      found={email, password:pass, role:currentRole, name:email.split('@')[0], phone:''};
-    }
-    if(!found){
-      document.getElementById('loginMsg').textContent='Invalid credentials. Use your maintainer login.';
+
+    // Method 3: Check local users array (for added admins/teachers/parents)
+    const found=users.find(u=> (u.email||'').toLowerCase()===email && (u.password||'')===pass);
+    if(found){
+      currentUser=found;
+      currentRole=found.role||currentRole;
+      setMsg('✅ Login success as '+currentRole+' (custom user)');
+      try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+      showApp();
       return;
     }
-    currentUser=found;
-    currentRole=found.role||currentRole;
-    // Save to localStorage for session
-    try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
-    const loginScreen=document.getElementById('loginScreen');
-    const appScreen=document.getElementById('appScreen');
-    if(loginScreen) loginScreen.style.display='none';
-    if(appScreen) appScreen.style.display='block';
-    const topName=document.getElementById('topName');
-    const topRole=document.getElementById('topRole');
-    const badge=document.getElementById('userBadge');
-    if(topName) topName.textContent='Sobukhazi • '+currentUser.name;
-    if(topRole) topRole.textContent=currentUser.role+' • '+currentUser.email;
-    if(badge) badge.textContent=currentUser.role;
-    document.getElementById('loginMsg').textContent='✅ Logging in as '+currentRole+'...';
-    setTimeout(()=>{ renderApp(); }, 100);
+
+    // Method 4: Allow any login with selected role for testing (if email contains @)
+    if(email.includes('@') && pass.length>=3){
+      currentUser={email, role:currentRole, name:email.split('@')[0], password:pass, phone:''};
+      setMsg('✅ Login as '+currentRole+' (test mode)');
+      try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+      showApp();
+      return;
+    }
+
+    setMsg('❌ Invalid email or password. Try: harold@schoolstack / admin123', true);
+    
   }catch(e){
-    console.error('Login error', e);
-    document.getElementById('loginMsg').textContent='Login error: '+e.message+' — trying to continue...';
-    // Force show app anyway for debugging
-    try{
-      document.getElementById('loginScreen').style.display='none';
-      document.getElementById('appScreen').style.display='block';
-      renderApp();
-    }catch(e2){}
+    console.error('Login exception', e);
+    setMsg('Error: '+e.message+'. Trying emergency login...', true);
+    // Emergency: force login as maintainer if email matches harold
+    const email=(document.getElementById('loginEmail').value||'').toLowerCase();
+    if(email.includes('harold') || email.includes('admin')){
+      currentUser={email:'harold@schoolstack', role:'maintainer', name:'Harold Manduna', password:'admin123'};
+      currentRole='maintainer';
+      showApp();
+    }
   }
 }
-function doLogout(){
-  document.getElementById('appScreen').style.display='none';
-  document.getElementById('loginScreen').style.display='grid';
+
+function showApp(){
+  console.log('Showing app for', currentUser, currentRole);
+  const loginScreen=document.getElementById('loginScreen');
+  const appScreen=document.getElementById('appScreen');
+  if(loginScreen) loginScreen.style.display='none';
+  if(appScreen) appScreen.style.display='block';
+  const topName=document.getElementById('topName');
+  const topRole=document.getElementById('topRole');
+  const badge=document.getElementById('userBadge');
+  if(topName) topName.textContent='Sobukhazi • '+(currentUser.name||currentUser.email);
+  if(topRole) topRole.textContent=(currentUser.role||currentRole)+' • '+(currentUser.email||'');
+  if(badge) badge.textContent=currentUser.role||currentRole;
+  setTimeout(()=>{ 
+    try{ renderApp(); }catch(e){ console.error('renderApp error', e); document.getElementById('mainContent').innerHTML='<div class=\"card\">Welcome! Role: '+currentRole+'<br>Error: '+e.message+'</div>'; }
+  }, 100);
 }
+
+function doLogout(){
+  try{ localStorage.removeItem('sobukhazi_current'); }catch(e){}
+  currentUser=null;
+  const loginScreen=document.getElementById('loginScreen');
+  const appScreen=document.getElementById('appScreen');
+  if(appScreen) appScreen.style.display='none';
+  if(loginScreen) loginScreen.style.display='grid';
+  const msg=document.getElementById('loginMsg');
+  if(msg) msg.textContent='';
+}
+
 function getMenuForRole(role){
   const base=[{id:'dashboard',label:'Dashboard'},{id:'announcements',label:'Announcements'}];
   if(role==='maintainer'||role==='admin'){

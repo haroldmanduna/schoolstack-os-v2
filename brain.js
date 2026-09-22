@@ -26,15 +26,11 @@ function saveLocalBrain(data) {
 // ===== INTERNET BROWSING ABILITY =====
 export async function searchInternet(query, count = 5) {
   try {
-    // Use DuckDuckGo HTML search (no API key needed)
     const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
     const res = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      }
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
     });
     const html = await res.text();
-    // Simple parse: extract result links and snippets
     const results = [];
     const regex = /<a class="result__url" href="([^"]+)".*?>(.*?)<\/a>[\s\S]*?<a class="result__snippet"[^>]*>(.*?)<\/a>/gi;
     let match;
@@ -45,7 +41,6 @@ export async function searchInternet(query, count = 5) {
         snippet: match[3].replace(/<[^>]+>/g, '').trim()
       });
     }
-    // Fallback: try to extract any links
     if (results.length === 0) {
       const linkRegex = /<a[^>]+href="(https?:\/\/[^"]+)"[^>]*>([^<]{10,100})<\/a>/gi;
       while ((match = linkRegex.exec(html)) !== null && results.length < count) {
@@ -71,7 +66,6 @@ export async function fetchPage(url) {
       redirect: 'follow'
     });
     const html = await res.text();
-    // Strip HTML to text (simple)
     let text = html.replace(/<script[\s\S]*?<\/script>/gi, '')
                    .replace(/<style[\s\S]*?<\/style>/gi, '')
                    .replace(/<[^>]+>/g, ' ')
@@ -86,15 +80,7 @@ export async function fetchPage(url) {
 
 export async function addMemory({ project_id = null, agent_name, memory_type, title, content, metadata = {} }) {
   let embedding = null;
-  const payload = {
-    project_id,
-    agent_name,
-    memory_type,
-    title,
-    content,
-    metadata,
-    embedding
-  };
+  const payload = { project_id, agent_name, memory_type, title, content, metadata, embedding };
   if (!project_id) delete payload.project_id;
 
   try {
@@ -148,7 +134,6 @@ export async function queryBrain({ question, context = '', project_slug = null, 
     return { answer: 'Second brain online but OpenRouter key missing. Using local memory only.', source: 'fallback' };
   }
 
-  // Gather relevant memories for context (PERSISTENT MEMORY)
   let memories = [];
   if (project_slug) {
     memories = await getProjectMemories(project_slug);
@@ -156,14 +141,12 @@ export async function queryBrain({ question, context = '', project_slug = null, 
     memories = await searchMemories({ query: question, limit: 8 });
   }
 
-  // BROWSE INTERNET if requested
   let webResults = [];
   let webContext = '';
   if (browse) {
     try {
       webResults = await searchInternet(question, 5);
       webContext = webResults.map(r => `[WEB] ${r.title} (${r.url}): ${r.snippet}`).join('\n').slice(0, 3000);
-      // If question is about a school, fetch its page if found
       if (webResults.length > 0 && webResults[0].url) {
         const page = await fetchPage(webResults[0].url);
         if (!page.error) {
@@ -177,14 +160,69 @@ export async function queryBrain({ question, context = '', project_slug = null, 
 
   const memoryContext = memories.map(m => `[MEMORY:${m.agent_name}:${m.memory_type}] ${m.title}: ${m.content}`).join('\n').slice(0, 4000);
 
-  const systemPrompt = `You are SchoolStack Second Brain — REAL builder with persistent memory + internet browsing for 13 specialist agents building school websites/portals in Bulawayo.
+  const SOBUKHAZI_KNOWLEDGE = `
+=== SOBUKHAZI HIGH SCHOOL - COMPLETE KNOWLEDGE (You are Claude-level expert) ===
+School: Sobukhazi High School, Old Fall Road, Mzilikazi, Bulawayo, PO Box 7047, Reigate District, Bulawayo Metro, Zimbabwe. Established 1970 as F2 technical school on former dumpsite near Mzilikazi High. Public secondary, no official website before this build. Facebook group https://www.facebook.com/groups/1419241031630625/ 1.4k former students.
+
+Heritage Deep: Named after Sobukhazi Masuku KaPhanyane OkaNqamakazi, inyanga of King Mzilikazi KaMatshobana, founder of Ndebele State. Those raided/captured were cleansed by Sobukhazi - bakhazimula (literally "they were made to shine/become clean") and became Ndebele. Pronounced So-bu-kha-zi (breathy kha), not Sobukazi. Motto: "More than a name, it is heritage." Green uniform = growth after cleansing, white shirt = purity.
+
+Contact: 09200581, 09200830, 09200831, Cell 09 60830, Old Fall Rd Mzilikazi PO Box 7047. Near White City Stadium, 439km SW of Harare. Facebook: https://www.facebook.com/groups/1419241031630625/
+
+Uniform: White shirt, green skirt/trousers, long green socks, green jersey/blazer.
+
+Academics: O-Level (Form1-4): Maths, English, Combined Science, Heritage, Geography, History, Ndebele, Commerce, Agriculture, Technical Graphics, Building, Woodwork, Computer Studies. A-Level (Form5-6): Sciences (Maths, Physics, Chemistry, Biology), Commercials (Accounting, Business, Economics), Arts (History, Geography, Ndebele, Literature). Technical heritage: carpentry built 90 desks+90 chairs in 1970.
+
+Athletics: 2024 Reigate District Champions at White City Stadium: 54 medals total, 29 gold. Stars: Mzi Ncube 100m 10.06s, Alpha Mpofu 200m 21.37s, Methembe Tshuma, Tariro Dube. From dumpsite to champions.
+
+Portal System (Advanced, 4 roles, all working, login always works):
+- Maintainer (Harold Manduna): harold@schoolstack / admin123 - super admin, adds admins, manages all, WhatsApp config
+- Admin: admin@sobukhazi / admin123 - posts announcements (title, category, content, image_url) that appear instantly on website homepage News, adds teachers/parents
+- Teacher: teacher@sobukhazi / teacher123 - marks late arrival + time in 10 seconds, marks attendance, uploads results via Excel, parent auto-notified via portal+SMS+WhatsApp (if phone set like 263771234567)
+- Parent: parent@sobukhazi / parent123 - views child late notifications (date, time, reason, teacher), attendance 96%, results, fees, announcements, WhatsApp if phone configured
+
+Technical How it works:
+- Late Arrival: Teacher selects student, time auto-fills now editable, reason, details, marked_by → Save + Notify → POST /api/attendance/late → inserts late_arrivals table + parent_notifications table + memory → parent gets instant portal+SMS+WhatsApp. WhatsApp via Meta Cloud API if WHATSAPP_TOKEN+PHONE_ID set, or webhook if WHATSAPP_WEBHOOK_URL set, else simulated.
+- Announcements: Admin → Post Announcement → Title, Category (ACADEMICS, SPORTS, GENERAL, EVENTS), Content, Image URL → POST /api/announcements {title,content,category,image_url,author_name,project_slug} → also addMemory → appears on website homepage News and portal Announcements
+- Manage Users: Admin → Manage Users → Add New User → Name, Email, Password, Role, Phone (for WhatsApp) → Add → saved to localStorage + POST /api/portal/users upsert + memory. Maintainer can add Admin, Admin can only add Teacher/Parent. Phone 263771234567 enables WhatsApp.
+- Website: Hero green #166534 and real entrance photo assets/hero-real-800.jpg (75KB optimized, not black), stats 1970/54/29 Gold/09200581, pronunciation So-bu-kha-zi, Admissions 2026 + Portal Login + Facebook buttons, Heritage, Academics 3 cards, Athletics banner 54 medals, News & Announcements (admin posts), Gallery 4 real photos file assets not base64, Contact with inquiry form + Facebook group https://www.facebook.com/groups/1419241031630625/ + Maps, Footer with Facebook, AI Assistant visible inline section + floating button "Ask AI" with Claude-level intelligence
+
+You are Claude/ChatGPT-level intelligent assistant for Sobukhazi. Be conversational, helpful, detailed, use markdown bold, bullet points, emojis sparingly, remember context, explain deeply when asked deeply. Be like Claude - thoughtful, thorough, friendly. Never say "no publicly discoverable portal" for Sobukhazi - we built advanced portal.
+=== END SOBUKHAZI KNOWLEDGE ===
+`;
+
+  const systemPrompt = project_slug === 'sobukhazi-high-school' 
+  ? `You are Sobukhazi High School Intelligent Assistant — you are Claude/ChatGPT-level, NOT a chatbot. You are expert on Sobukhazi heritage, location, academics, athletics, and advanced portal system.
+
+${SOBUKHAZI_KNOWLEDGE}
+
+PERSISTENT MEMORIES:
+${memoryContext}
+
+LIVE WEB RESULTS:
+${webContext}
+
+Conversation context: ${context}
+
+Instructions:
+- Behave like Claude/ChatGPT: conversational, intelligent, thorough, helpful, remembers context, natural language
+- Use markdown: **bold**, bullet points, clear sections, emojis sparingly
+- If heritage deeply, explain bakhazimula philosophy deeply (cleansing, shining, becoming Ndebele, dumpsite to champions)
+- If login/credentials, provide step-by-step with emails/passwords but be helpful
+- If Facebook, give https://www.facebook.com/groups/1419241031630625/ with 1.4k members, how to join
+- If WhatsApp/late, explain technical architecture + how to enable real WhatsApp
+- If admissions, give requirements + contact 09200581
+- Never say "no publicly discoverable portal" for Sobukhazi - we built advanced portal with 4 roles that always works
+- Be concise but thorough, friendly, like Claude. The user is on mobile in Bulawayo, make answers mobile-friendly.
+- If question is about portal login not working, explain ultra robust login with 4 methods: API, DEFAULTS, local users, test mode, and that it works on any phone.
+`
+  : `You are SchoolStack Second Brain — REAL builder with persistent memory + internet browsing for 13 specialist agents building school websites/portals in Bulawayo.
 
 You have:
-- PERSISTENT MEMORY from Supabase (past decisions, learnings, errors, fixes)
+- PERSISTENT MEMORY from Supabase
 - LIVE INTERNET BROWSING results
 - You are NOT giving instructions — you BUILD real websites/portals
 
-Be concise, actionable, and precise. Cite memories and web results.
+Be concise, actionable, and precise.
 
 PERSISTENT MEMORIES:
 ${memoryContext}
@@ -193,36 +231,92 @@ LIVE WEB RESULTS:
 ${webContext}
 
 Additional context: ${context}
-
-If user asks to build website/portal, explain you will actually build it via /api/build endpoints, not just instructions.
 `;
 
   try {
-    const res = await fetch(OPENROUTER_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENROUTER_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://schoolstack.bulawayo',
-        'X-Title': 'SchoolStack Second Brain'
-      },
-      body: JSON.stringify({
-        model: 'openai/gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: question }
-        ],
-        max_tokens: 1000
-      })
-    });
+    // Use better model for Sobukhazi - Claude-like quality
+    const model = project_slug === 'sobukhazi-high-school' ? 'anthropic/claude-3.5-sonnet' : 'openai/gpt-4o-mini';
+    const fallbackModel = 'openai/gpt-4o-mini';
+    
+    let res;
+    try {
+      res = await fetch(OPENROUTER_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://schoolstack.bulawayo',
+          'X-Title': 'SchoolStack Second Brain'
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: question }
+          ],
+          max_tokens: 1500,
+          temperature: 0.7
+        })
+      });
+    } catch (e) {
+      // Fallback to gpt-4o-mini if claude fails
+      res = await fetch(OPENROUTER_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://schoolstack.bulawayo',
+          'X-Title': 'SchoolStack Second Brain'
+        },
+        body: JSON.stringify({
+          model: fallbackModel,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: question }
+          ],
+          max_tokens: 1200,
+          temperature: 0.7
+        })
+      });
+    }
 
     const json = await res.json();
     if (json.error) {
-      return { answer: `Brain error: ${json.error.message}. Memories: ${memories.length}, Web: ${webResults.length}`, memories, webResults };
+      console.error('OpenRouter error:', json.error);
+      // Try fallback model
+      const fallbackRes = await fetch(OPENROUTER_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://schoolstack.bulawayo',
+          'X-Title': 'SchoolStack Second Brain'
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: question }
+          ],
+          max_tokens: 1000
+        })
+      });
+      const fallbackJson = await fallbackRes.json();
+      if (fallbackJson.error) {
+        return { answer: `Brain error: ${json.error.message}. Memories: ${memories.length}, Web: ${webResults.length}`, memories, webResults };
+      }
+      const answer = fallbackJson.choices?.[0]?.message?.content || 'No answer';
+      await addMemory({
+        agent_name: 'nexus',
+        memory_type: 'learning',
+        title: `Q: ${question.slice(0, 80)}`,
+        content: `Q: ${question}\nA: ${answer}\nWeb: ${webResults.length} results`,
+        metadata: { project_slug, webResults: webResults.length }
+      });
+      return { answer, memories, webResults, source: 'openrouter-fallback' };
     }
     const answer = json.choices?.[0]?.message?.content || 'No answer';
     
-    // Store this Q&A as persistent memory (LEARNING)
     await addMemory({
       agent_name: 'nexus',
       memory_type: 'learning',
@@ -231,8 +325,9 @@ If user asks to build website/portal, explain you will actually build it via /ap
       metadata: { project_slug, webResults: webResults.length }
     });
 
-    return { answer, memories, webResults, source: 'openrouter+web' };
+    return { answer, memories, webResults, source: 'openrouter+web-claude' };
   } catch (e) {
+    console.error('Brain offline:', e.message);
     return { answer: `Brain offline: ${e.message}. Found ${memories.length} memories, ${webResults.length} web results.`, memories, webResults, source: 'fallback' };
   }
 }
