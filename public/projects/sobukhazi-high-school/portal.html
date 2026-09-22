@@ -42,16 +42,16 @@ body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--sla
 </div>
 <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase">Select Role</div>
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
-<button id="role-maintainer" class="role-btn active" onclick="selectRole('maintainer')">Maintainer</button>
+<button id="role-maintainer" class="role-btn" onclick="selectRole('maintainer')">Maintainer</button>
 <button id="role-admin" class="role-btn" onclick="selectRole('admin')">Admin</button>
 <button id="role-teacher" class="role-btn" onclick="selectRole('teacher')">Teacher</button>
 <button id="role-parent" class="role-btn" onclick="selectRole('parent')">Parent</button>
 </div>
 <div style="display:grid;gap:10px">
-<input id="loginEmail" class="input" placeholder="Email" autocomplete="email" value="harold@schoolstack">
-<input id="loginPass" class="input" type="password" placeholder="Password" autocomplete="current-password" value="admin123">
-<button onclick="doLogin()" type="button" class="btn btn-green" style="width:100%;padding:12px">Login →</button>
-<div id="loginMsg" style="font-size:12px;color:var(--muted)"></div>
+<input id="loginEmail" class="input" placeholder="Enter email" autocomplete="off" spellcheck="false" autocapitalize="off">
+<input id="loginPass" class="input" type="password" placeholder="Enter password" autocomplete="new-password">
+<button onclick="doLogin()" type="button" id="loginBtn" class="btn btn-green" style="width:100%;padding:12px">Login →</button>
+<div id="loginMsg" style="font-size:12px;color:var(--muted);min-height:18px"></div>
 </div>
 <div style="margin-top:18px;padding:12px;background:#F8FAFC;border:1px solid var(--line);border-radius:10px;font-size:11px;color:var(--muted);line-height:1.5">
 <b style="color:var(--slate)">Secure Portal</b> — Select role above, enter your credentials to login.<br>
@@ -82,11 +82,12 @@ Need help? Contact IT or use AI assistant on main website.<br>
 </div>
 
 <script>
-let currentRole='maintainer';
+
+let currentRole='';
 let currentUser=null;
 let users=[];
 
-// Hardcoded defaults - ALWAYS work, no localStorage needed
+// Hardcoded defaults - ALWAYS work, no network needed - INSTANT LOGIN FIRST
 const DEFAULTS={
   maintainer:{email:'harold@schoolstack',pass:'admin123',name:'Harold Manduna',role:'maintainer'},
   admin:{email:'admin@sobukhazi',pass:'admin123',name:'Admin Office',role:'admin'},
@@ -94,7 +95,6 @@ const DEFAULTS={
   parent:{email:'parent@sobukhazi',pass:'parent123',name:'Parent Dube',role:'parent'}
 };
 
-// Try load local users but don't fail if not available
 try{
   const stored=localStorage.getItem('sobukhazi_users');
   if(stored) users=JSON.parse(stored);
@@ -116,7 +116,7 @@ function selectRole(r){
     if(passEl) passEl.value=d.pass;
   }
   const msg=document.getElementById('loginMsg');
-  if(msg) msg.textContent='';
+  if(msg) msg.textContent='Selected '+r+' — tap Login';
   console.log('Selected role', r);
 }
 
@@ -124,29 +124,37 @@ async function doLogin(){
   const msgEl=document.getElementById('loginMsg');
   const emailEl=document.getElementById('loginEmail');
   const passEl=document.getElementById('loginPass');
-  
+  const btnEl=document.getElementById('loginBtn');
   const setMsg=(t, isError=false)=>{
     if(msgEl){
       msgEl.textContent=t;
       msgEl.style.color=isError?'#DC2626':'#166534';
     }
-    console.log('Login msg:', t);
   };
-
   try{
     const email=(emailEl.value||'').trim().toLowerCase();
     const pass=(passEl.value||'').trim();
-    
-    console.log('Attempt login', email, currentRole);
-    
     if(!email||!pass){
-      setMsg('Enter email and password', true);
+      setMsg('Enter email and password or tap a role', true);
       return;
     }
+    if(btnEl){ btnEl.disabled=true; btnEl.textContent='Logging in...'; }
+    setMsg('Verifying...');
 
-    setMsg('⏳ Logging in...');
+    // 1 - DEFAULTS first instant
+    for(let k in DEFAULTS){
+      const d=DEFAULTS[k];
+      if(d.email.toLowerCase()===email && d.pass===pass){
+        currentUser={email:d.email, role:d.role, name:d.name, password:d.pass, phone:''};
+        currentRole=d.role;
+        try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+        if(btnEl){ btnEl.disabled=false; btnEl.textContent='Login →'; }
+        showApp();
+        return;
+      }
+    }
 
-    // Method 1: Try Supabase API login first (works on any phone)
+    // 2 - API
     try{
       const resp=await fetch('/api/portal/login',{
         method:'POST',
@@ -154,68 +162,44 @@ async function doLogin(){
         body:JSON.stringify({email, password:pass, project_slug:'sobukhazi-high-school'})
       });
       const data=await resp.json();
-      console.log('API login response', data);
       if(data.success && data.user){
         currentUser={email:data.user.email, role:data.user.role, name:data.user.name, password:pass, phone:''};
         currentRole=data.user.role;
-        setMsg('✅ Login success via server as '+currentRole);
-        // Save session
         try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
-        showApp();
-        return;
-      } else if(data.error){
-        console.log('API login failed', data.error);
-        // Continue to fallback
-      }
-    }catch(e){
-      console.log('API login error, fallback to local', e.message);
-    }
-
-    // Method 2: Check hardcoded DEFAULTS (always works)
-    for(let k in DEFAULTS){
-      const d=DEFAULTS[k];
-      if(d.email.toLowerCase()===email && d.pass===pass){
-        currentUser={email:d.email, role:d.role, name:d.name, password:d.pass, phone:''};
-        currentRole=d.role;
-        setMsg('✅ Login success as '+currentRole+' (local)');
-        try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+        if(btnEl){ btnEl.disabled=false; btnEl.textContent='Login →'; }
         showApp();
         return;
       }
-    }
+    }catch(e){ console.log('API fail', e.message); }
 
-    // Method 3: Check local users array (for added admins/teachers/parents)
+    // 3 - local users
     const found=users.find(u=> (u.email||'').toLowerCase()===email && (u.password||'')===pass);
     if(found){
       currentUser=found;
-      currentRole=found.role||currentRole;
-      setMsg('✅ Login success as '+currentRole+' (custom user)');
+      currentRole=found.role||currentRole||'teacher';
       try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+      if(btnEl){ btnEl.disabled=false; btnEl.textContent='Login →'; }
       showApp();
       return;
     }
 
-    // Method 4: Allow any login with selected role for testing (if email contains @)
+    // 4 - test mode any @
     if(email.includes('@') && pass.length>=3){
-      currentUser={email, role:currentRole, name:email.split('@')[0], password:pass, phone:''};
-      setMsg('✅ Login as '+currentRole+' (test mode)');
+      const roleToUse = currentRole || 'parent';
+      currentUser={email, role:roleToUse, name:email.split('@')[0], password:pass, phone:''};
+      currentRole=roleToUse;
       try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+      if(btnEl){ btnEl.disabled=false; btnEl.textContent='Login →'; }
       showApp();
       return;
     }
 
-    setMsg('❌ Invalid email or password. Try: harold@schoolstack / admin123', true);
-    
+    setMsg('Invalid credentials', true);
+    if(btnEl){ btnEl.disabled=false; btnEl.textContent='Login →'; }
   }catch(e){
-    console.error('Login exception', e);
-    setMsg('Error: '+e.message+'. Trying emergency login...', true);
-    // Emergency: force login as maintainer if email matches harold
-    const email=(document.getElementById('loginEmail').value||'').toLowerCase();
-    if(email.includes('harold') || email.includes('admin')){
-      currentUser={email:'harold@schoolstack', role:'maintainer', name:'Harold Manduna', password:'admin123'};
-      currentRole='maintainer';
-      showApp();
-    }
+    console.error(e);
+    setMsg('Error: '+e.message, true);
+    const b=document.getElementById('loginBtn'); if(b){b.disabled=false; b.textContent='Login →';}
   }
 }
 
