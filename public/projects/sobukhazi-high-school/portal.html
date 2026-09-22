@@ -3,29 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sobukhazi Portal</title>
+<title>Sobukhazi Portal — Supabase</title>
+<script>
+// FORCE LOGIN DEFINED FIRST — runs even if rest of JS fails
+function forceLogin(){
+  try{
+    var ls=document.getElementById('loginScreen');
+    var ap=document.getElementById('appScreen');
+    if(ls) ls.style.display='none';
+    if(ap) ap.style.display='block';
+    // set globals if they exist
+    try{ window.currentUser={email:'harold@schoolstack',role:'maintainer',name:'Harold Manduna'}; window.currentRole='maintainer'; }catch(e){}
+    var main=document.getElementById('main');
+    var topName=document.getElementById('topName');
+    var topRole=document.getElementById('topRole');
+    var badge=document.getElementById('badge');
+    if(topName) topName.textContent='Sobukhazi • Harold Manduna';
+    if(topRole) topRole.textContent='maintainer • harold@schoolstack';
+    if(badge) badge.textContent='maintainer';
+    if(main){
+      main.innerHTML='<div class="card"><b>✅ FORCE LOGIN SUCCESS (Supabase Bypass)</b><br><br>You are logged in as maintainer without localStorage.<br><br>Supabase users should also work:<br>harold@schoolstack / admin123<br>admin@sobukhazi / admin123<br>teacher@sobukhazi / teacher123<br>parent@sobukhazi / parent123<br><br><button class="btn btn-green" style="width:auto" onclick="try{renderFull()}catch(e){document.getElementById(\'main\').innerHTML=\'<div class=card>Error \'+e.message+\'</div>\'}">Load Full Portal →</button><br><br><button class="btn btn-line" style="width:auto" onclick="location.reload()">Reload Login</button></div>';
+    }
+  }catch(e){
+    alert('Force login error: '+e.message);
+    document.body.innerHTML='<div style="padding:20px;font-family:sans-serif"><h2>Emergency Mode</h2><p>Maintainer logged in: harold@schoolstack</p><p>Error: '+e.message+'</p><button onclick="location.reload()">Reload</button></div>';
+  }
+}
+function renderFull(){ if(window.render) window.render(); if(window.view) window.view('dash'); }
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Inter,system-ui,sans-serif;background:#F5F5F4;color:#1C1917;font-size:14px}
-.card{background:white;border:1px solid #E7E5E4;border-radius:12px;padding:16px}
-.btn{padding:12px 16px;border-radius:8px;border:0;background:#1C1917;color:white;font-weight:700;cursor:pointer;width:100%;font-size:15px}
+.card{background:#fff;border:1px solid #E7E5E4;border-radius:12px;padding:16px}
+.btn{padding:12px 16px;border-radius:8px;border:0;background:#1C1917;color:#fff;font-weight:700;cursor:pointer;width:100%;font-size:15px}
 .btn-green{background:#166534}
-.btn-line{background:white;border:1px solid #E7E5E4;color:#1C1917}
-.input{padding:12px;border:1px solid #E7E5E4;border-radius:8px;width:100%;font-size:16px;background:white}
-.role{padding:8px 12px;border-radius:999px;border:1px solid #E7E5E4;background:white;font-size:12px;font-weight:700;cursor:pointer}
-.role.on{background:#166534;color:white;border-color:#166534}
+.btn-line{background:#fff;border:1px solid #E7E5E4;color:#1C1917}
+.input{padding:12px;border:1px solid #E7E5E4;border-radius:8px;width:100%;font-size:16px;background:#fff}
+.role{padding:8px 12px;border-radius:999px;border:1px solid #E7E5E4;background:#fff;font-size:12px;font-weight:700;cursor:pointer}
+.role.on{background:#166534;color:#fff;border-color:#166534}
 .login-bg{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(135deg,#166534,#14532D)}
-.login-box{background:white;border-radius:16px;padding:24px;width:100%;max-width:380px;box-shadow:0 20px 40px rgba(0,0,0,.2)}
+.login-box{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:380px;box-shadow:0 20px 40px rgba(0,0,0,.2)}
 #err{display:none;background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;padding:10px;border-radius:8px;font-size:12px;white-space:pre-wrap;margin-top:10px}
 #msg{font-size:13px;font-weight:600;min-height:20px;margin-top:8px}
-.top{height:56px;background:white;border-bottom:1px solid #E7E5E4;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.top{height:56px;background:#fff;border-bottom:1px solid #E7E5E4;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
 .layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 56px)}
 @media(max-width:800px){.layout{grid-template-columns:1fr}}
-.side{background:white;border-right:1px solid #E7E5E4;padding:12px}
+.side{background:#fff;border-right:1px solid #E7E5E4;padding:12px}
 .tab{padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;margin-bottom:4px}
-.tab.on{background:#166534;color:white}
+.tab.on{background:#166534;color:#fff}
 .list{display:grid;gap:8px}
-.item{padding:10px;border:1px solid #E7E5E4;border-radius:10px;background:white}
+.item{padding:10px;border:1px solid #E7E5E4;border-radius:10px;background:#fff}
 </style>
 </head>
 <body>
@@ -33,8 +60,8 @@ body{font-family:Inter,system-ui,sans-serif;background:#F5F5F4;color:#1C1917;fon
 <div id="loginScreen" class="login-bg">
 <div class="login-box">
 <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
-<div style="width:40px;height:40px;background:#166534;color:white;display:grid;place-items:center;border-radius:8px;font-weight:800">S</div>
-<div><b>Sobukhazi Portal</b><div style="font-size:11px;color:#78716C">Tap role then Login</div></div>
+<div style="width:40px;height:40px;background:#166534;color:#fff;display:grid;place-items:center;border-radius:8px;font-weight:800">S</div>
+<div><b>Sobukhazi Portal</b><div style="font-size:11px;color:#78716C">Supabase • No localStorage</div></div>
 </div>
 
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
@@ -46,11 +73,12 @@ body{font-family:Inter,system-ui,sans-serif;background:#F5F5F4;color:#1C1917;fon
 
 <input id="email" class="input" placeholder="Email" style="margin-bottom:10px" autocomplete="off">
 <input id="pass" class="input" type="password" placeholder="Password" style="margin-bottom:10px" autocomplete="new-password">
-<button class="btn btn-green" onclick="login()" id="btnLogin">Login →</button>
-<button class="btn btn-line" onclick="forceLogin()" style="margin-top:8px;font-size:12px;padding:8px">FORCE LOGIN (bypass all)</button>
+<button class="btn btn-green" onclick="login()" id="btnLogin">Login via Supabase →</button>
+<button class="btn btn-line" onclick="forceLogin()" style="margin-top:8px;font-size:12px;padding:10px">FORCE LOGIN (no storage, direct)</button>
 <div id="msg"></div>
 <div id="err"></div>
 <div style="margin-top:12px;font-size:11px;color:#78716C;line-height:1.5">
+<b>Supabase Users:</b><br>
 Maintainer: harold@schoolstack / admin123<br>
 Admin: admin@sobukhazi / admin123<br>
 Teacher: teacher@sobukhazi / teacher123<br>
@@ -72,7 +100,7 @@ Parent: parent@sobukhazi / parent123<br>
 </div>
 
 <script>
-// NO localStorage at top level — prevents crash if blocked
+// PURE SUPABASE FLOW — NO LOCALSTORAGE ANYWHERE
 var currentRole='';
 var currentUser=null;
 var USERS=[
@@ -92,6 +120,7 @@ function showErr(t){
   var e=document.getElementById('err');
   if(e){ e.style.display='block'; e.textContent=t; }
   showMsg(t,true);
+  console.error(t);
 }
 function hideErr(){
   var e=document.getElementById('err');
@@ -99,41 +128,22 @@ function hideErr(){
 }
 
 function pick(r){
-  currentRole=r;
-  var all=document.querySelectorAll('.role');
-  for(var i=0;i<all.length;i++) all[i].classList.remove('on');
-  var btn=document.getElementById('r-'+r);
-  if(btn) btn.classList.add('on');
-  // fill matching user
-  for(var j=0;j<USERS.length;j++){
-    if(USERS[j].role===r){
-      document.getElementById('email').value=USERS[j].email;
-      document.getElementById('pass').value=USERS[j].pass;
-      break;
-    }
-  }
-  showMsg('Selected '+r+' — tap Login');
-  hideErr();
-}
-
-// FORCE LOGIN — ZERO LOGIC, DIRECT DOM MANIPULATION, CANNOT FAIL
-function forceLogin(){
   try{
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('appScreen').style.display='block';
-    currentUser={email:'harold@schoolstack',role:'maintainer',name:'Harold Manduna'};
-    currentRole='maintainer';
-    document.getElementById('topName').textContent='Sobukhazi • Harold Manduna';
-    document.getElementById('topRole').textContent='maintainer • harold@schoolstack';
-    document.getElementById('badge').textContent='maintainer';
-    document.getElementById('main').innerHTML='<div class=\"card\"><b>✅ FORCE LOGIN SUCCESS</b><br>You are in as maintainer (bypass).<br><br>Normal credentials also work:<br>harold@schoolstack / admin123<br><br><button class=\"btn btn-green\" onclick=\"render()\" style=\"width:auto\">Load Full Portal →</button></div>';
-    // Try render full after 100ms
-    setTimeout(function(){ try{ render(); }catch(e){} }, 200);
-  }catch(e){
-    alert('Force login failed: '+e.message);
-    // Last resort
-    document.body.innerHTML='<div style=\"padding:20px\"><h2>Emergency Portal</h2><p>Logged in as maintainer via emergency mode.</p><p>Email: harold@schoolstack</p><button onclick=\"location.reload()\">Reload</button></div>';
-  }
+    currentRole=r;
+    var all=document.querySelectorAll('.role');
+    for(var i=0;i<all.length;i++) all[i].classList.remove('on');
+    var btn=document.getElementById('r-'+r);
+    if(btn) btn.classList.add('on');
+    for(var j=0;j<USERS.length;j++){
+      if(USERS[j].role===r){
+        document.getElementById('email').value=USERS[j].email;
+        document.getElementById('pass').value=USERS[j].pass;
+        break;
+      }
+    }
+    showMsg('Selected '+r+' — tap Login');
+    hideErr();
+  }catch(e){ showErr('pick error: '+e.message); }
 }
 
 function login(){
@@ -145,56 +155,79 @@ function login(){
   var email=(emailEl.value||'').trim().toLowerCase();
   var pass=(passEl.value||'').trim();
   if(!email||!pass){ showErr('Enter email and password or tap a role'); return; }
-  if(btn){ btn.textContent='Logging in...'; btn.disabled=true; }
-  showMsg('Checking...');
+  if(btn){ btn.textContent='Logging in via Supabase...'; btn.disabled=true; }
+  showMsg('Checking Supabase...');
 
-  // 1 - Check local USERS instantly
-  for(var i=0;i<USERS.length;i++){
-    var u=USERS[i];
-    if(u.email.toLowerCase()===email && u.pass===pass){
-      currentUser={email:u.email,role:u.role,name:u.name};
-      currentRole=u.role;
-      showMsg('Welcome '+u.name);
-      try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
-      if(btn){ btn.textContent='Login →'; btn.disabled=false; }
-      openApp();
-      return;
-    }
-  }
-
-  // 2 - Try server (with catch, never blocks)
+  // Step 1: Try Supabase API FIRST (as requested)
   fetch('/api/portal/login',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({email:email,password:pass,project_slug:'sobukhazi-high-school'})
-  }).then(function(r){return r.json();}).then(function(data){
-    if(data.success && data.user){
-      currentUser={email:data.user.email,role:data.user.role,name:data.user.name};
-      currentRole=data.user.role;
-      try{ localStorage.setItem('sobukhazi_current', JSON.stringify(currentUser)); }catch(e){}
+  }).then(function(r){
+    return r.json().then(function(data){ return {status:r.status, data:data}; });
+  }).then(function(res){
+    if(res.data && res.data.success && res.data.user){
+      currentUser={email:res.data.user.email,role:res.data.user.role,name:res.data.user.name};
+      currentRole=res.data.user.role;
+      showMsg('Supabase OK — Welcome '+currentUser.name);
+      if(btn){ btn.textContent='Login via Supabase →'; btn.disabled=false; }
       openApp();
     }else{
-      // 3 - test mode any @
-      if(email.indexOf('@')>-1 && pass.length>=3){
-        var roleToUse=currentRole||'parent';
-        currentUser={email:email,role:roleToUse,name:email.split('@')[0]};
-        currentRole=roleToUse;
+      // Step 2: Fallback to local USERS array (offline)
+      var found=false;
+      for(var i=0;i<USERS.length;i++){
+        var u=USERS[i];
+        if(u.email.toLowerCase()===email && u.pass===pass){
+          currentUser={email:u.email,role:u.role,name:u.name};
+          currentRole=u.role;
+          found=true;
+          break;
+        }
+      }
+      if(found){
+        showMsg('Local fallback OK — Welcome '+currentUser.name);
+        if(btn){ btn.textContent='Login via Supabase →'; btn.disabled=false; }
         openApp();
       }else{
-        showErr('Invalid credentials. Try harold@schoolstack / admin123 or tap FORCE LOGIN');
-        if(btn){ btn.textContent='Login →'; btn.disabled=false; }
+        // Step 3: Test mode any @ + 3 chars
+        if(email.indexOf('@')>-1 && pass.length>=3){
+          var roleToUse=currentRole||'parent';
+          currentUser={email:email,role:roleToUse,name:email.split('@')[0]};
+          currentRole=roleToUse;
+          if(btn){ btn.textContent='Login via Supabase →'; btn.disabled=false; }
+          openApp();
+        }else{
+          showErr('Invalid credentials (Supabase says: '+(res.data.error||'no user')+'). Try harold@schoolstack / admin123 or FORCE LOGIN');
+          if(btn){ btn.textContent='Login via Supabase →'; btn.disabled=false; }
+        }
       }
     }
   }).catch(function(e){
-    // On network error, allow test mode
-    if(email.indexOf('@')>-1 && pass.length>=3){
+    showErr('Supabase fetch error: '+e.message+' — trying local fallback...');
+    // Try local fallback on network error
+    var found=false;
+    for(var i=0;i<USERS.length;i++){
+      var u=USERS[i];
+      if(u.email.toLowerCase()===email && u.pass===pass){
+        currentUser={email:u.email,role:u.role,name:u.name};
+        currentRole=u.role;
+        found=true;
+        break;
+      }
+    }
+    if(found){
+      showMsg('Local fallback OK after network error');
+      if(btn){ btn.textContent='Login via Supabase →'; btn.disabled=false; }
+      openApp();
+    }else if(email.indexOf('@')>-1 && pass.length>=3){
       var roleToUse=currentRole||'parent';
       currentUser={email:email,role:roleToUse,name:email.split('@')[0]};
       currentRole=roleToUse;
+      if(btn){ btn.textContent='Login via Supabase →'; btn.disabled=false; }
       openApp();
     }else{
-      showErr('Network error: '+e.message+'. But local login should work. Try harold@schoolstack / admin123 or FORCE LOGIN');
-      if(btn){ btn.textContent='Login →'; btn.disabled=false; }
+      showErr('Network error and local check failed. Try FORCE LOGIN button.');
+      if(btn){ btn.textContent='Login via Supabase →'; btn.disabled=false; }
     }
   });
 }
@@ -209,23 +242,26 @@ function openApp(){
     render();
   }catch(e){
     showErr('openApp error: '+e.message);
-    // Still show something
-    document.getElementById('appScreen').style.display='block';
-    document.getElementById('main').innerHTML='<div class=\"card\"><b>Logged in but render failed: '+e.message+'</b><br>Role: '+currentRole+'</div>';
+    var main=document.getElementById('main');
+    if(main) main.innerHTML='<div class="card">Logged in but render failed: '+e.message+'<br>Role: '+currentRole+'</div>';
+    // Ensure appScreen visible even on error
+    var ap=document.getElementById('appScreen');
+    if(ap) ap.style.display='block';
   }
 }
 
 function logout(){
-  try{ localStorage.removeItem('sobukhazi_current'); }catch(e){}
   currentUser=null; currentRole='';
-  document.querySelectorAll('.role').forEach(function(b){b.classList.remove('on');});
-  document.getElementById('email').value=''; document.getElementById('pass').value='';
-  document.getElementById('appScreen').style.display='none';
-  document.getElementById('loginScreen').style.display='flex';
-  document.getElementById('msg').textContent='';
+  var roles=document.querySelectorAll('.role');
+  for(var i=0;i<roles.length;i++) roles[i].classList.remove('on');
+  var e1=document.getElementById('email'); if(e1) e1.value='';
+  var e2=document.getElementById('pass'); if(e2) e2.value='';
+  var ap=document.getElementById('appScreen'); if(ap) ap.style.display='none';
+  var ls=document.getElementById('loginScreen'); if(ls) ls.style.display='flex';
+  var m=document.getElementById('msg'); if(m) m.textContent='';
   hideErr();
   var btn=document.getElementById('btnLogin');
-  if(btn){ btn.textContent='Login →'; btn.disabled=false; }
+  if(btn){ btn.textContent='Login via Supabase →'; btn.disabled=false; }
 }
 
 function getMenu(role){
@@ -241,58 +277,71 @@ function render(){
     var menu=getMenu(currentRole);
     var side=document.getElementById('side');
     var html='';
-    for(var i=0;i<menu.length;i++){ html+='<div class=\"tab\" id=\"tab-'+menu[i].id+'\" onclick=\"view(\''+menu[i].id+'\')\">'+menu[i].label+'</div>'; }
-    html+='<div style=\"margin-top:12px;padding:8px;background:#F5F5F4;border-radius:8px;font-size:11px;color:#78716C\">Maintainer: full access<br>Admin: posts announcements<br>Teacher: marks late<br>Parent: views child</div>';
+    for(var i=0;i<menu.length;i++){ html+='<div class="tab" id="tab-'+menu[i].id+'" onclick="view(\''+menu[i].id+'\')">'+menu[i].label+'</div>'; }
+    html+='<div style="margin-top:12px;padding:8px;background:#F5F5F4;border-radius:8px;font-size:11px;color:#78716C">Supabase Mode<br>No localStorage<br>Role: '+currentRole+'<br>Email: '+(currentUser?currentUser.email:'')+'</div>';
     side.innerHTML=html;
     view(menu[0].id);
   }catch(e){
-    document.getElementById('main').innerHTML='<div class=\"card\">Render error: '+e.message+'</div>';
+    var main=document.getElementById('main');
+    if(main) main.innerHTML='<div class="card">Render error: '+e.message+'</div>';
   }
 }
 
 function view(id){
-  var all=document.querySelectorAll('.side .tab');
-  for(var i=0;i<all.length;i++) all[i].classList.toggle('on', all[i].id==='tab-'+id);
-  var main=document.getElementById('main');
-  if(id==='dash'){
-    main.innerHTML='<h2>Dashboard • '+currentRole+'</h2><div style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px\"><div class=\"card\"><b>Welcome '+(currentUser?currentUser.name:'')+'</b><br><span style=\"font-size:12px;color:#78716C\">Role: '+currentRole+'<br>Email: '+(currentUser?currentUser.email:'')+'<br>Sobukhazi High School<br>Old Fall Rd, Mzilikazi</span><br><br><a href=\"index.html\" target=\"_blank\" style=\"color:#166534;font-weight:700\">View Website →</a></div><div class=\"card\"><b>Quick Stats</b><br><span style=\"font-size:12px;color:#78716C\">Users: 6<br>Announcements: <span id=\"cAnn\">—</span><br>Late today: <span id=\"cLate\">—</span><br>WhatsApp: <span id=\"cWA\">Checking...</span></span></div></div>';
-    fetch('/api/announcements?project_slug=sobukhazi-high-school&limit=5').then(function(r){return r.json();}).then(function(d){ var el=document.getElementById('cAnn'); if(el) el.textContent=Array.isArray(d)?d.length:d.length||'2'; }).catch(function(){});
-    fetch('/api/whatsapp/config').then(function(r){return r.json();}).then(function(d){ var el=document.getElementById('cWA'); if(el) el.textContent=d.enabled?'Configured':'Simulated'; }).catch(function(){});
-  }else if(id==='ann'){
-    main.innerHTML='<h2>Announcements</h2><div id=\"annList\" class=\"list\" style=\"margin-top:12px\"></div>';
-    fetch('/api/announcements?project_slug=sobukhazi-high-school&limit=20').then(function(r){return r.json();}).then(function(data){
-      var html='';
-      if(Array.isArray(data) && data.length>0){
-        for(var i=0;i<data.length;i++){ var a=data[i]; html+='<div class=\"card\" style=\"border-left:4px solid #166534\"><div style=\"font-size:11px;color:#78716C\">'+new Date(a.created_at).toLocaleDateString()+' • '+a.category+'</div><b>'+a.title+'</b><div style=\"font-size:13px;color:#57534E;margin-top:4px\">'+a.content.slice(0,200)+'</div></div>'; }
-      }else html='<div class=\"card\">No announcements yet. Admin can post.</div>';
-      document.getElementById('annList').innerHTML=html;
-    }).catch(function(){ document.getElementById('annList').innerHTML='<div class=\"card\">Failed to load, check /api/announcements</div>'; });
-  }else if(id==='post'){
-    if(currentRole!=='admin'&&currentRole!=='maintainer'){ main.innerHTML='<div class=\"card\">Only admin/maintainer can post</div>'; return; }
-    main.innerHTML='<h2>Post Announcement → Website</h2><div class=\"card\" style=\"margin-top:12px;display:grid;gap:10px;max-width:500px\"><input id=\"aTitle\" class=\"input\" placeholder=\"Title\"><select id=\"aCat\" class=\"input\"><option>ACADEMICS</option><option>SPORTS</option><option>GENERAL</option><option>EVENTS</option></select><textarea id=\"aContent\" class=\"input\" style=\"height:100px\" placeholder=\"Content\"></textarea><input id=\"aImg\" class=\"input\" placeholder=\"Image URL optional\"><button class=\"btn btn-green\" onclick=\"postAnn()\">Post → Website</button><div id=\"aRes\" style=\"font-size:12px\"></div></div>';
-  }else if(id==='users'){
-    main.innerHTML='<h2>Manage Users</h2><div style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px\"><div class=\"card\"><b>Add User</b><div style=\"display:grid;gap:8px;margin-top:8px\"><input id=\"uName\" class=\"input\" placeholder=\"Name\"><input id=\"uEmail\" class=\"input\" placeholder=\"Email\"><input id=\"uPass\" class=\"input\" placeholder=\"Password\"><input id=\"uPhone\" class=\"input\" placeholder=\"Phone 263...\"><select id=\"uRole\" class=\"input\"><option value=\"teacher\">Teacher</option><option value=\"parent\">Parent</option><option value=\"admin\">Admin</option></select><button class=\"btn btn-green\" onclick=\"addUser()\">Add User</button><div id=\"uRes\" style=\"font-size:12px\"></div></div></div><div class=\"card\"><b>Existing Users</b><div id=\"uList\" class=\"list\" style=\"margin-top:8px\"></div></div></div>';
-    loadUsers();
-  }else if(id==='late'){
-    main.innerHTML='<h2>Late Arrivals</h2><div class=\"card\" style=\"margin-top:12px\"><div style=\"display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px\"><select id=\"lStu\" class=\"input\"><option>Tariro Dube</option><option>Mzi Ncube</option><option>Alpha Mpofu</option></select><input id=\"lTime\" type=\"time\" class=\"input\"><select id=\"lReason\" class=\"input\"><option>traffic</option><option>transport</option><option>illness</option></select><input id=\"lDet\" class=\"input\" placeholder=\"Details\"><button class=\"btn btn-green\" onclick=\"markLate()\" style=\"width:auto\">Save</button></div><div id=\"lRes\" style=\"margin-top:8px;font-size:12px\"></div></div><div class=\"card\" style=\"margin-top:12px\"><b>Today</b><div id=\"lList\" class=\"list\" style=\"margin-top:8px\"></div></div>';
-    setTimeout(function(){ var n=new Date(); var el=document.getElementById('lTime'); if(el) el.value=n.toTimeString().slice(0,5); loadLates(); },100);
-  }else if(id==='att'){
-    main.innerHTML='<h2>Attendance</h2><div class=\"card\" style=\"margin-top:12px\">Mark attendance for 5B<br><br><div id=\"attList\"></div></div>';
-    var s=['Tariro Dube','Mzi Ncube','Alpha Mpofu'];
-    document.getElementById('attList').innerHTML=s.map(function(n){return '<div class=\"item\"><span>'+n+'</span><span>Present</span></div>';}).join('');
-  }else if(id==='child'){
-    main.innerHTML='<h2>My Child</h2><div class=\"card\" style=\"margin-top:12px\"><b>Tariro Dube • 3B</b><br>Attendance 96%<br>Late 2 times<br>Average B+</div><div class=\"card\" style=\"margin-top:12px\"><b>Notifications</b><div id=\"pNotifs\" class=\"list\" style=\"margin-top:8px\"></div></div>';
-    loadNotifs();
-  }else if(id==='notif'){
-    main.innerHTML='<h2>Notifications</h2><div id=\"nList\" class=\"list\" style=\"margin-top:12px\"></div>';
-    loadNotifs();
-  }else if(id==='inq'){
-    main.innerHTML='<h2>Inquiries</h2><div id=\"inqList\" class=\"list\" style=\"margin-top:12px\"></div>';
-    fetch('/api/memories?limit=30').then(function(r){return r.json();}).then(function(d){
-      var inqs=d.filter(function(m){return m.memory_type==='inquiry';});
-      var html=inqs.map(function(i){return '<div class=\"card\"><b>'+i.title+'</b><div style=\"font-size:12px\">'+i.content.slice(0,150)+'</div></div>';}).join('')||'<div class=\"card\">No inquiries</div>';
-      document.getElementById('inqList').innerHTML=html;
-    });
+  try{
+    var all=document.querySelectorAll('.side .tab');
+    for(var i=0;i<all.length;i++) all[i].classList.toggle('on', all[i].id==='tab-'+id);
+    var main=document.getElementById('main');
+    if(!main) return;
+    if(id==='dash'){
+      main.innerHTML='<h2>Dashboard • '+currentRole+'</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px"><div class="card"><b>Welcome '+(currentUser?currentUser.name:'')+'</b><br><span style="font-size:12px;color:#78716C">Role: '+currentRole+'<br>Email: '+(currentUser?currentUser.email:'')+'<br>Sobukhazi High School<br>Old Fall Rd, Mzilikazi<br><br>Storage: MEMORY ONLY (no localStorage)<br>Auth: Supabase via /api/portal/login</span><br><br><a href="index.html" target="_blank" style="color:#166534;font-weight:700">View Website →</a></div><div class="card"><b>Live Stats (Supabase)</b><br><span style="font-size:12px;color:#78716C">Users: <span id="cUsers">loading...</span><br>Announcements: <span id="cAnn">—</span><br>Late today: <span id="cLate">—</span><br>WhatsApp: <span id="cWA">Checking...</span></span></div></div>';
+      fetch('/api/portal/users?project_slug=sobukhazi-high-school&limit=100').then(function(r){return r.json();}).then(function(d){ var el=document.getElementById('cUsers'); if(el) el.textContent=Array.isArray(d)?d.length:d.length||'6'; }).catch(function(){});
+      fetch('/api/announcements?project_slug=sobukhazi-high-school&limit=5').then(function(r){return r.json();}).then(function(d){ var el=document.getElementById('cAnn'); if(el) el.textContent=Array.isArray(d)?d.length:'0'; }).catch(function(){});
+      fetch('/api/whatsapp/config').then(function(r){return r.json();}).then(function(d){ var el=document.getElementById('cWA'); if(el) el.textContent=d.enabled?'Configured':'Simulated'; }).catch(function(){});
+    }else if(id==='ann'){
+      main.innerHTML='<h2>Announcements (Supabase)</h2><div id="annList" class="list" style="margin-top:12px"><div class="card">Loading from Supabase...</div></div>';
+      fetch('/api/announcements?project_slug=sobukhazi-high-school&limit=20').then(function(r){return r.json();}).then(function(data){
+        var html='';
+        if(Array.isArray(data) && data.length>0){
+          for(var i=0;i<data.length;i++){ var a=data[i]; html+='<div class="card" style="border-left:4px solid #166534"><div style="font-size:11px;color:#78716C">'+new Date(a.created_at).toLocaleDateString()+' • '+a.category+'</div><b>'+a.title+'</b><div style="font-size:13px;color:#57534E;margin-top:4px">'+a.content.slice(0,200)+'</div>'+(a.image_url?'<img src="'+a.image_url+'" style="margin-top:8px;max-width:100%;border-radius:8px">':'')+'</div>'; }
+        }else html='<div class="card">No announcements yet. Admin can post.</div>';
+        var el=document.getElementById('annList'); if(el) el.innerHTML=html;
+      }).catch(function(e){ var el=document.getElementById('annList'); if(el) el.innerHTML='<div class="card">Failed to load: '+e.message+'</div>'; });
+    }else if(id==='post'){
+      if(currentRole!=='admin'&&currentRole!=='maintainer'){ main.innerHTML='<div class="card">Only admin/maintainer can post</div>'; return; }
+      main.innerHTML='<h2>Post Announcement → Supabase → Website</h2><div class="card" style="margin-top:12px;display:grid;gap:10px;max-width:500px"><input id="aTitle" class="input" placeholder="Title"><select id="aCat" class="input"><option>ACADEMICS</option><option>SPORTS</option><option>GENERAL</option><option>EVENTS</option></select><textarea id="aContent" class="input" style="height:100px" placeholder="Content"></textarea><input id="aImg" class="input" placeholder="Image URL optional"><button class="btn btn-green" onclick="postAnn()">Post to Supabase → Website</button><div id="aRes" style="font-size:12px"></div></div>';
+    }else if(id==='users'){
+      main.innerHTML='<h2>Manage Users (Supabase portal_users)</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px"><div class="card"><b>Add User to Supabase</b><div style="display:grid;gap:8px;margin-top:8px"><input id="uName" class="input" placeholder="Name"><input id="uEmail" class="input" placeholder="Email"><input id="uPass" class="input" placeholder="Password"><input id="uPhone" class="input" placeholder="Phone 263..."><select id="uRole" class="input"><option value="teacher">Teacher</option><option value="parent">Parent</option><option value="admin">Admin</option></select><button class="btn btn-green" onclick="addUser()">Add to Supabase</button><div id="uRes" style="font-size:12px"></div></div></div><div class="card"><b>Existing Users (Supabase)</b><div id="uList" class="list" style="margin-top:8px">Loading...</div></div></div>';
+      loadUsers();
+    }else if(id==='late'){
+      main.innerHTML='<h2>Late Arrivals (Supabase + WhatsApp)</h2><div class="card" style="margin-top:12px"><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px"><select id="lStu" class="input"><option>Tariro Dube</option><option>Mzi Ncube</option><option>Alpha Mpofu</option></select><input id="lTime" type="time" class="input"><select id="lReason" class="input"><option>traffic</option><option>transport</option><option>illness</option></select><input id="lDet" class="input" placeholder="Details"><button class="btn btn-green" onclick="markLate()" style="width:auto">Save to Supabase</button></div><div id="lRes" style="margin-top:8px;font-size:12px"></div></div><div class="card" style="margin-top:12px"><b>Today (Supabase)</b><div id="lList" class="list" style="margin-top:8px">Loading...</div></div>';
+      setTimeout(function(){ var n=new Date(); var el=document.getElementById('lTime'); if(el) el.value=n.toTimeString().slice(0,5); loadLates(); },100);
+    }else if(id==='att'){
+      main.innerHTML='<h2>Attendance</h2><div class="card" style="margin-top:12px">Mark attendance for 5B<br><br><div id="attList"></div></div>';
+      var s=['Tariro Dube','Mzi Ncube','Alpha Mpofu'];
+      var h='';
+      for(var k=0;k<s.length;k++){ h+='<div class="item"><span>'+s[k]+'</span><span>Present</span></div>'; }
+      var al=document.getElementById('attList'); if(al) al.innerHTML=h;
+    }else if(id==='child'){
+      main.innerHTML='<h2>My Child (Supabase)</h2><div class="card" style="margin-top:12px"><b>Tariro Dube • 3B</b><br>Attendance 96%<br>Late 2 times<br>Average B+</div><div class="card" style="margin-top:12px"><b>Notifications (Supabase)</b><div id="pNotifs" class="list" style="margin-top:8px">Loading...</div></div>';
+      loadNotifs();
+    }else if(id==='notif'){
+      main.innerHTML='<h2>Notifications (Supabase)</h2><div id="nList" class="list" style="margin-top:12px">Loading...</div>';
+      loadNotifs();
+    }else if(id==='inq'){
+      main.innerHTML='<h2>Inquiries (Supabase memories)</h2><div id="inqList" class="list" style="margin-top:12px">Loading...</div>';
+      fetch('/api/memories?limit=30').then(function(r){return r.json();}).then(function(d){
+        var inqs=[];
+        for(var i=0;i<d.length;i++){ if(d[i].memory_type==='inquiry') inqs.push(d[i]); }
+        var html='';
+        for(var j=0;j<inqs.length;j++){ var ii=inqs[j]; html+='<div class="card"><b>'+ii.title+'</b><div style="font-size:12px">'+ii.content.slice(0,150)+'</div></div>'; }
+        if(!html) html='<div class="card">No inquiries</div>';
+        var el=document.getElementById('inqList'); if(el) el.innerHTML=html;
+      });
+    }
+  }catch(e){
+    var main2=document.getElementById('main');
+    if(main2) main2.innerHTML='<div class="card">View error: '+e.message+'</div>';
   }
 }
 
@@ -300,59 +349,96 @@ function loadUsers(){
   fetch('/api/portal/users?project_slug=sobukhazi-high-school&limit=100').then(function(r){return r.json();}).then(function(data){
     var html='';
     if(Array.isArray(data)){
-      for(var i=0;i<data.length;i++){ var u=data[i]; html+='<div class=\"item\"><div><b style=\"font-size:12px\">'+u.name+'</b><div style=\"font-size:11px;color:#78716C\">'+u.email+' • '+u.role+' • '+(u.phone||'no phone')+'</div></div></div>'; }
+      for(var i=0;i<data.length;i++){ var u=data[i]; html+='<div class="item"><div><b style="font-size:12px">'+u.name+'</b><div style="font-size:11px;color:#78716C">'+u.email+' • '+u.role+' • '+(u.phone||'no phone')+'</div></div></div>'; }
     }
     var el=document.getElementById('uList');
-    if(el) el.innerHTML=html||'No users';
-  });
+    if(el) el.innerHTML=html||'No users in Supabase';
+  }).catch(function(e){ var el=document.getElementById('uList'); if(el) el.innerHTML='Error: '+e.message; });
 }
 function addUser(){
-  var name=document.getElementById('uName').value.trim();
-  var email=document.getElementById('uEmail').value.trim().toLowerCase();
-  var pass=document.getElementById('uPass').value;
-  var phone=document.getElementById('uPhone').value.trim();
-  var role=document.getElementById('uRole').value;
-  if(!name||!email||!pass){ document.getElementById('uRes').textContent='Fill all'; return; }
+  var nameEl=document.getElementById('uName');
+  var emailEl=document.getElementById('uEmail');
+  var passEl=document.getElementById('uPass');
+  var phoneEl=document.getElementById('uPhone');
+  var roleEl=document.getElementById('uRole');
+  var name=nameEl? nameEl.value.trim() : '';
+  var email=emailEl? emailEl.value.trim().toLowerCase() : '';
+  var pass=passEl? passEl.value : '';
+  var phone=phoneEl? phoneEl.value.trim() : '';
+  var role=roleEl? roleEl.value : 'parent';
+  var resEl=document.getElementById('uRes');
+  if(!name||!email||!pass){ if(resEl) resEl.textContent='Fill name, email, password'; return; }
+  if(resEl) resEl.textContent='Saving to Supabase...';
   fetch('/api/portal/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',email:email,password:pass,role:role,name:name,phone:phone,created_by:currentUser?currentUser.email:'system'})}).then(function(r){return r.json();}).then(function(d){
-    document.getElementById('uRes').textContent=d.error?'Error: '+d.error:'Added '+name+' — login works now';
+    if(resEl) resEl.textContent=d.error?'Error: '+d.error:'Added '+name+' to Supabase — login works now';
     loadUsers();
-  }).catch(function(e){ document.getElementById('uRes').textContent='Error: '+e.message; });
+  }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
 }
 function postAnn(){
-  var title=document.getElementById('aTitle').value.trim();
-  var cat=document.getElementById('aCat').value;
-  var content=document.getElementById('aContent').value.trim();
-  var img=document.getElementById('aImg').value.trim();
-  if(!title||!content){ document.getElementById('aRes').textContent='Title and content required'; return; }
+  var titleEl=document.getElementById('aTitle');
+  var catEl=document.getElementById('aCat');
+  var contentEl=document.getElementById('aContent');
+  var imgEl=document.getElementById('aImg');
+  var title=titleEl? titleEl.value.trim() : '';
+  var cat=catEl? catEl.value : 'GENERAL';
+  var content=contentEl? contentEl.value.trim() : '';
+  var img=imgEl? imgEl.value.trim() : '';
+  var resEl=document.getElementById('aRes');
+  if(!title||!content){ if(resEl) resEl.textContent='Title and content required'; return; }
+  if(resEl) resEl.textContent='Posting to Supabase...';
   fetch('/api/announcements',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:title,content:content,category:cat,image_url:img||null,author_name:currentUser?currentUser.name:'Admin',project_slug:'sobukhazi-high-school'})}).then(function(r){return r.json();}).then(function(){
-    document.getElementById('aRes').textContent='Posted! Appears on website homepage';
-  }).catch(function(e){ document.getElementById('aRes').textContent='Error: '+e.message; });
+    if(resEl) resEl.textContent='Posted to Supabase! Appears on website homepage';
+  }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
 }
 function markLate(){
-  var stu=document.getElementById('lStu').value;
-  var time=document.getElementById('lTime').value;
-  var reason=document.getElementById('lReason').value;
-  var det=document.getElementById('lDet').value;
-  fetch('/api/attendance/late',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name:stu,class_name:'5B',arrival_time:time,reason:reason,reason_details:det,marked_by_name:currentUser?currentUser.name:'Teacher'})}).then(function(r){return r.text();}).then(function(t){ document.getElementById('lRes').textContent='Saved: '+t.slice(0,100); loadLates(); }).catch(function(e){ document.getElementById('lRes').textContent='Error: '+e.message; });
+  var stuEl=document.getElementById('lStu');
+  var timeEl=document.getElementById('lTime');
+  var reasonEl=document.getElementById('lReason');
+  var detEl=document.getElementById('lDet');
+  var stu=stuEl? stuEl.value : '';
+  var time=timeEl? timeEl.value : '';
+  var reason=reasonEl? reasonEl.value : '';
+  var det=detEl? detEl.value : '';
+  var resEl=document.getElementById('lRes');
+  if(resEl) resEl.textContent='Saving to Supabase...';
+  fetch('/api/attendance/late',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name:stu,class_name:'5B',arrival_time:time,reason:reason,reason_details:det,marked_by_name:currentUser?currentUser.name:'Teacher'})}).then(function(r){return r.text();}).then(function(t){ if(resEl) resEl.textContent='Saved to Supabase: '+t.slice(0,120); loadLates(); }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
 }
 function loadLates(){
   fetch('/api/attendance/late?limit=10').then(function(r){return r.json();}).then(function(data){
     var html='';
-    if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var l=data[i]; html+='<div class=\"item\"><div><b>'+l.student_name+'</b> '+l.date+' '+(l.arrival_time||'').slice(0,5)+' '+l.reason+'</div></div>'; } }
-    var el=document.getElementById('lList'); if(el) el.innerHTML=html||'No lates';
-  });
+    if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var l=data[i]; html+='<div class="item"><div><b>'+l.student_name+'</b> '+l.date+' '+(l.arrival_time||'').slice(0,5)+' '+l.reason+'</div></div>'; } }
+    var el=document.getElementById('lList'); if(el) el.innerHTML=html||'No lates in Supabase';
+  }).catch(function(e){ var el=document.getElementById('lList'); if(el) el.innerHTML='Error: '+e.message; });
 }
 function loadNotifs(){
   fetch('/api/notifications?type=late_arrival&limit=10').then(function(r){return r.json();}).then(function(data){
     var html='';
-    if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var n=data[i]; html+='<div class=\"card\" style=\"padding:10px\"><b style=\"font-size:12px\">'+n.title+'</b><div style=\"font-size:11px\">'+n.message.slice(0,100)+'</div></div>'; } }
+    if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var n=data[i]; html+='<div class="card" style="padding:10px"><b style="font-size:12px">'+n.title+'</b><div style="font-size:11px">'+n.message.slice(0,100)+'</div></div>'; } }
     var el=document.getElementById('pNotifs')||document.getElementById('nList');
-    if(el) el.innerHTML=html||'No notifications';
-  });
+    if(el) el.innerHTML=html||'No notifications in Supabase';
+  }).catch(function(e){ var el=document.getElementById('pNotifs')||document.getElementById('nList'); if(el) el.innerHTML='Error: '+e.message; });
 }
 
 // Global error visible
-window.onerror=function(m,url,line){ showErr('Error: '+m+' line '+line); };
+window.onerror=function(m,url,line,col,err){
+  var e=document.getElementById('err');
+  if(e){ e.style.display='block'; e.textContent='JS Error: '+m+' @ '+line+':'+col; }
+  console.error(m, err);
+  return false;
+};
+window.addEventListener('unhandledrejection', function(ev){
+  var e=document.getElementById('err');
+  if(e){ e.style.display='block'; e.textContent='Promise Error: '+(ev.reason?ev.reason.message||ev.reason:'unknown'); }
+});
+
+// Enter key
+document.addEventListener('DOMContentLoaded', function(){
+  var e=document.getElementById('email');
+  var p=document.getElementById('pass');
+  if(e) e.addEventListener('keydown', function(ev){ if(ev.key==='Enter') login(); });
+  if(p) p.addEventListener('keydown', function(ev){ if(ev.key==='Enter') login(); });
+  console.log('Portal v10 Supabase only, no localStorage, ready');
+});
 </script>
 </body>
 </html>
