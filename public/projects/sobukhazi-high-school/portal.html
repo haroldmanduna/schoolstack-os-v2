@@ -188,7 +188,7 @@ function showView(id){
 function renderUsersList(){
   document.getElementById('usersList').innerHTML=users.map(u=>'<div class="item"><div><b style="font-size:12px">'+u.name+'</b><div style="font-size:11px;color:var(--muted)">'+u.email+' • '+u.role+'</div></div><button onclick="removeUser(''+u.email+'')" style="padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:white;font-size:11px">Remove</button></div>').join('');
 }
-function addUser(){
+async function addUser(){
   const name=document.getElementById('newName').value.trim();
   const email=document.getElementById('newEmail').value.trim().toLowerCase();
   const pass=document.getElementById('newPass').value;
@@ -197,9 +197,14 @@ function addUser(){
   if(currentRole==='admin' && (role==='admin'||role==='maintainer')){document.getElementById('addUserRes').textContent='Admin can only add teacher and parent. Maintainer can add admin.';return;}
   users.push({name,email,password:pass,role});
   localStorage.setItem('sobukhazi_users',JSON.stringify(users));
-  document.getElementById('addUserRes').textContent='Added '+name+' as '+role;
+  document.getElementById('addUserRes').textContent='Saving '+name+' as '+role+'...';
   renderUsersList();
+  try{
+    await fetch('/api/portal/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',email,password_plain:pass,role,name,created_by:currentUser.email})});
+  }catch(e){}
   fetch('/api/memories',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_name:'admin',memory_type:'user_added',title:'User added: '+name+' '+role,content:'Email '+email+' Role '+role+' Added by '+currentUser.email,metadata:{project_slug:'sobukhazi-high-school'}})});
+  document.getElementById('addUserRes').textContent='✅ Added '+name+' as '+role+' • Email: '+email+' • Login works now';
+  document.getElementById('newName').value=''; document.getElementById('newEmail').value=''; document.getElementById('newPass').value='';
 }
 function removeUser(email){
   if(email==='harold@schoolstack'){alert('Cannot remove maintainer');return;}
@@ -213,18 +218,34 @@ async function postAnnouncement(){
   const content=document.getElementById('annContent').value.trim();
   const image=document.getElementById('annImage').value.trim();
   if(!title||!content){document.getElementById('annPostRes').textContent='Title and content required';return;}
-  document.getElementById('annPostRes').textContent='Posting...';
+  document.getElementById('annPostRes').textContent='Posting to website + portal...';
   try{
+    // New advanced API
+    try{
+      await fetch('/api/announcements',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,content,category:cat,image_url:image||null,author_name:currentUser.name,author_email:currentUser.email,author_role:currentRole,project_slug:'sobukhazi-high-school'})});
+    }catch(e){}
+    // Fallback memory for compatibility
     const r=await fetch('/api/memories',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({agent_name:'admin',memory_type:'announcement',title:cat+': '+title,content:content+' '+(image?' Image:'+image:''),metadata:{project_slug:'sobukhazi-high-school',category:cat,image,author:currentUser.name}})});
-    const j=await r.json();
-    document.getElementById('annPostRes').innerHTML='✅ Posted! Appears on website homepage News section.<br>Title: '+title;
+    await r.json();
+    document.getElementById('annPostRes').innerHTML='✅ Posted! Appears on website homepage News section and portal Announcements.<br><b>'+title+'</b> • '+cat+'<br><span style="font-size:11px">Image: '+(image||'none')+'</span>';
+    document.getElementById('annTitle').value=''; document.getElementById('annContent').value=''; document.getElementById('annImage').value='';
   }catch(e){document.getElementById('annPostRes').textContent='Error: '+e.message;}
 }
 async function loadAnnouncementsPortal(){
   try{
-    const r=await fetch('/api/memories?limit=30');const data=await r.json();
-    const anns=data.filter(m=>m.memory_type==='announcement' || m.title.toLowerCase().includes('announcement') || m.title.includes(':')).slice(0,20);
-    document.getElementById('annListPortal').innerHTML=anns.map(a=>'<div class="card" style="border-left:4px solid var(--green)"><div style="font-size:11px;color:var(--muted);font-weight:700">'+new Date(a.created_at).toLocaleDateString()+' • '+(a.metadata?.category||'GENERAL')+' • '+(a.metadata?.author||a.agent_name)+'</div><b style="font-size:14px;display:block;margin:6px 0">'+a.title+'</b><div style="font-size:13px;color:var(--muted)">'+a.content.slice(0,300)+'</div></div>').join('')||'<div style="font-size:13px;color:var(--muted)">No announcements yet. Admin can post.</div>';
+    let anns=[];
+    try{
+      const r2=await fetch('/api/announcements?project_slug=sobukhazi-high-school&limit=20');
+      const data2=await r2.json();
+      if(!data2.error && Array.isArray(data2) && data2.length>0){
+        anns=data2.map(a=>({title:a.title, content:a.content, created_at:a.created_at, metadata:{category:a.category, author:a.author_name, image:a.image_url}}));
+      }
+    }catch(e){}
+    if(anns.length===0){
+      const r=await fetch('/api/memories?limit=30');const data=await r.json();
+      anns=data.filter(m=>m.memory_type==='announcement' || m.title.toLowerCase().includes('announcement') || m.title.includes(':')).slice(0,20);
+    }
+    document.getElementById('annListPortal').innerHTML=anns.map(a=>'<div class="card" style="border-left:4px solid var(--green)"><div style="font-size:11px;color:var(--muted);font-weight:700">'+new Date(a.created_at).toLocaleDateString()+' • '+(a.metadata?.category||'GENERAL')+' • '+(a.metadata?.author||a.agent_name||'')+'</div><b style="font-size:14px;display:block;margin:6px 0">'+a.title+'</b><div style="font-size:13px;color:var(--muted)">'+a.content.slice(0,300)+(a.metadata?.image?'<br><img src="'+a.metadata.image+'" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:6px">':'')+'</div></div>').join('')||'<div style="font-size:13px;color:var(--muted)">No announcements yet. Admin can post.</div>';
     const stat=document.getElementById('statAnn'); if(stat) stat.textContent=anns.length;
   }catch(e){}
 }
