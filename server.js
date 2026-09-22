@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { supabase } from './supabase.js';
 import { addMemory, searchMemories, getProjectMemories, queryBrain, logAgentAction, searchInternet, fetchPage } from './brain.js';
-import { buildRealWebsite, buildRealPortal } from './builder.js';
+import { buildRealWebsite, buildRealPortal, markLateArrival } from './builder.js';
 import fs from 'fs';
 
 dotenv.config();
@@ -21,8 +21,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/projects', express.static(path.join(__dirname, 'public', 'projects')));
 app.use('/old-projects', express.static('/home/user/SchoolStack/projects'));
 
-let dbStatus = { connected: false, error: null };
-
 async function testConnection() {
   try {
     const { data, error } = await supabase.from('projects').select('id').limit(1);
@@ -33,17 +31,15 @@ async function testConnection() {
   }
 }
 
-// Health
 app.get('/api/health', async (req, res) => {
   const conn = await testConnection();
-  dbStatus = conn;
   res.json({ 
     status: 'ok', 
     time: new Date().toISOString(),
     db: conn,
     agents: 13,
-    version: '3.0-real-builders+internet',
-    features: ['real_website_builder','real_portal_builder','persistent_memory_supabase','internet_browsing','hermes_learning']
+    version: '3.1-real-builders+late-system+internet',
+    features: ['real_website_builder','real_portal_builder','late_arrival_auto_notify','persistent_memory_supabase','internet_browsing','hermes_learning']
   });
 });
 
@@ -54,22 +50,7 @@ app.get('/api/projects', async (req, res) => {
   res.json(data);
 });
 
-app.post('/api/projects', async (req, res) => {
-  const { name, type, brief } = req.body;
-  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const { data, error } = await supabase.from('projects').insert({ slug, name, type, brief }).select().single();
-  if (error) return res.status(400).json({ error: error.message });
-  await addMemory({
-    project_id: data.id,
-    agent_name: 'nexus',
-    memory_type: 'decision',
-    title: `Project created: ${name}`,
-    content: `Created project ${name} type ${type}. Brief: ${brief}`
-  });
-  res.json(data);
-});
-
-// REAL BUILDERS — Actually build websites, not instructions
+// REAL BUILDERS
 app.post('/api/build/website', async (req, res) => {
   const { school_name, type, location, tagline, colors } = req.body;
   if (!school_name) return res.status(400).json({ error: 'school_name required' });
@@ -96,6 +77,36 @@ app.post('/api/build/portal', async (req, res) => {
   res.json(result);
 });
 
+// LATE ARRIVAL SYSTEM — Teacher marks late + time, parent auto notified
+app.post('/api/attendance/late', async (req, res) => {
+  const { student_name, class_name, arrival_time, reason, reason_details, marked_by_name, location } = req.body;
+  if (!student_name || !class_name) return res.status(400).json({ error: 'student_name and class_name required' });
+  const result = await markLateArrival({ student_name, class_name, arrival_time, reason, reason_details, marked_by_name: marked_by_name || 'Teacher', location });
+  if (!result.success) return res.status(400).json(result);
+  res.json(result);
+});
+
+app.get('/api/attendance/late', async (req, res) => {
+  const { student, class: className, date, limit = 50 } = req.query;
+  let q = supabase.from('late_arrivals').select('*').order('created_at', { ascending: false }).limit(parseInt(limit));
+  if (student) q = q.ilike('student_name', `%${student}%`);
+  if (className) q = q.eq('class_name', className);
+  if (date) q = q.eq('date', date);
+  const { data, error } = await q;
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+app.get('/api/notifications', async (req, res) => {
+  const { student, type, limit = 50 } = req.query;
+  let q = supabase.from('parent_notifications').select('*').order('sent_at', { ascending: false }).limit(parseInt(limit));
+  if (student) q = q.ilike('student_name', `%${student}%`);
+  if (type) q = q.eq('type', type);
+  const { data, error } = await q;
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
 // Memories / Second Brain (PERSISTENT)
 app.get('/api/memories', async (req, res) => {
   const { q, agent, project, limit } = req.query;
@@ -113,7 +124,6 @@ app.get('/api/projects/:slug/memories', async (req, res) => {
   res.json(memories);
 });
 
-// Brain query with INTERNET BROWSING + PERSISTENT MEMORY
 app.post('/api/brain/query', async (req, res) => {
   const { question, context, project_slug, browse } = req.body;
   if (!question) return res.status(400).json({ error: 'question required' });
@@ -129,12 +139,11 @@ app.post('/api/brain/query', async (req, res) => {
   res.json(result);
 });
 
-// INTERNET BROWSING ABILITY
+// INTERNET BROWSING
 app.post('/api/browse/search', async (req, res) => {
   const { query, count } = req.body;
   if (!query) return res.status(400).json({ error: 'query required' });
   const results = await searchInternet(query, count || 8);
-  // Store search as memory (persistent)
   await addMemory({
     agent_name: 'beacon',
     memory_type: 'observation',
@@ -159,7 +168,7 @@ app.post('/api/browse/fetch', async (req, res) => {
   res.json(page);
 });
 
-// Beacon leads (PERSISTENT)
+// Beacon
 app.get('/api/beacon/leads', async (req, res) => {
   const { classification, limit = 50 } = req.query;
   let query = supabase.from('beacon_leads').select('*').order('opportunity_score', { ascending: false }).limit(parseInt(limit));
@@ -195,7 +204,6 @@ app.get('/api/beacon/stats', async (req, res) => {
   res.json(stats);
 });
 
-// Decisions, Tasks, Logs, Skills (PERSISTENT MEMORY VISIBLE)
 app.get('/api/decisions', async (req, res) => {
   const { data } = await supabase.from('decisions').select('*').order('created_at', { ascending: false }).limit(50);
   res.json(data || []);
@@ -217,7 +225,6 @@ app.get('/api/reflections', async (req, res) => {
   res.json(data || []);
 });
 
-// Serve built projects list
 app.get('/api/built', (req, res) => {
   const publicProjects = path.join(__dirname, 'public', 'projects');
   try {
@@ -239,8 +246,7 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', async () => {
-  console.log(`🚀 SchoolStack REAL BUILDERS v3 live on 0.0.0.0:${PORT}`);
+  console.log(`🚀 SchoolStack REAL BUILDERS v3.1 live on 0.0.0.0:${PORT} — Late Arrival System + Internet Browsing + Persistent Memory`);
   const conn = await testConnection();
   console.log('DB:', conn);
-  console.log('Features: real_website_builder, real_portal_builder, persistent_memory, internet_browsing, hermes_learning');
 });
