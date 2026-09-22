@@ -3,27 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sobukhazi Portal — Production v12</title>
-<script>
-function forceLogin(){
-  try{
-    var ls=document.getElementById('loginScreen');
-    var ap=document.getElementById('appScreen');
-    if(ls) ls.style.display='none';
-    if(ap) ap.style.display='block';
-    try{ window.currentUser={email:'harold@schoolstack',role:'maintainer',name:'Harold Manduna'}; window.currentRole='maintainer'; }catch(e){}
-    var main=document.getElementById('main');
-    var topName=document.getElementById('topName');
-    var topRole=document.getElementById('topRole');
-    var badge=document.getElementById('badge');
-    if(topName) topName.textContent='Sobukhazi • Harold Manduna';
-    if(topRole) topRole.textContent='maintainer • harold@schoolstack';
-    if(badge) badge.textContent='maintainer';
-    if(main){ main.innerHTML='<div class="card"><b>✅ FORCE LOGIN SUCCESS</b><br>Production v12 — Supabase only<br><button class="btn btn-green" style="width:auto;margin-top:10px" onclick="renderFull()">Load Portal →</button></div>'; }
-  }catch(e){ alert('Force login error: '+e.message); }
-}
-function renderFull(){ if(window.render) window.render(); }
-</script>
+<title>Sobukhazi Portal — Secure v13</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Inter,system-ui,sans-serif;background:#F5F5F4;color:#1C1917;font-size:14px}
@@ -57,7 +37,6 @@ body{font-family:Inter,system-ui,sans-serif;background:#F5F5F4;color:#1C1917;fon
 .sheet input:focus{border-color:#166534;outline:none;box-shadow:0 0 0 2px rgba(22,101,52,.15)}
 .badge{padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700}
 .badge-green{background:#DCFCE7;color:#166534}
-.badge-gray{background:#F5F5F4;color:#57534E}
 .preview-img{max-width:100%;max-height:220px;border-radius:8px;margin-top:8px;border:1px solid #E7E5E4}
 .tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .tabs button{padding:8px 14px;border-radius:999px;border:1px solid #E7E5E4;background:#fff;font-size:12px;font-weight:700;cursor:pointer}
@@ -70,22 +49,33 @@ body{font-family:Inter,system-ui,sans-serif;background:#F5F5F4;color:#1C1917;fon
 <div class="login-box">
 <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
 <div style="width:40px;height:40px;background:#166534;color:#fff;display:grid;place-items:center;border-radius:8px;font-weight:800">S</div>
-<div><b>Sobukhazi Portal v12</b><div style="font-size:11px;color:#78716C">Production • No test data • Bulk results</div></div>
+<div><b>Sobukhazi Portal</b><div style="font-size:11px;color:#78716C">Secure • Supabase • Production v13</div></div>
 </div>
+
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
 <button class="role" id="r-maintainer" onclick="pick('maintainer')">Maintainer</button>
 <button class="role" id="r-admin" onclick="pick('admin')">Admin</button>
 <button class="role" id="r-teacher" onclick="pick('teacher')">Teacher</button>
 <button class="role" id="r-parent" onclick="pick('parent')">Parent</button>
 </div>
+
 <input id="email" class="input" placeholder="Email" style="margin-bottom:10px" autocomplete="off">
 <input id="pass" class="input" type="password" placeholder="Password" style="margin-bottom:10px" autocomplete="new-password">
-<button class="btn btn-green" onclick="login()" id="btnLogin">Login via Supabase →</button>
-<button class="btn btn-line" onclick="forceLogin()" style="margin-top:8px;font-size:12px;padding:10px">FORCE LOGIN (no storage)</button>
+<button class="btn btn-green" onclick="login()" id="btnLogin">Secure Login →</button>
 <div id="msg"></div><div id="err"></div>
-<div style="margin-top:12px;font-size:11px;color:#78716C;line-height:1.5">
-harold@schoolstack / admin123 • admin@sobukhazi / admin123<br>teacher@sobukhazi / teacher123 • parent@sobukhazi / parent123<br>
-<a href="index.html" style="color:#166534">← Website</a>
+
+<div style="margin-top:14px;padding:10px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;font-size:11px;color:#166534;line-height:1.5">
+<b>🔒 Secure Access</b><br>
+• No passwords displayed on this page<br>
+• Contact admin for login credentials<br>
+• Maintainer manages all accounts<br>
+• Parents see ONLY their child (private)<br>
+<a href="index.html" style="color:#166534;font-weight:700">← Back to Website</a>
+</div>
+
+<div style="margin-top:10px;font-size:10px;color:#A8A29E;text-align:center">
+Sobukhazi High School • Old Fall Rd, Mzilikazi • Est. 1970<br>
+Production v13 • Supabase • No test data
 </div>
 </div>
 </div>
@@ -93,7 +83,7 @@ harold@schoolstack / admin123 • admin@sobukhazi / admin123<br>teacher@sobukhaz
 <div id="appScreen" style="display:none">
 <div class="top">
 <div><b id="topName">Portal</b> <span id="topRole" style="font-size:11px;color:#78716C"></span></div>
-<div style="display:flex;gap:8px"><span id="badge" class="badge badge-green">Logged</span><button class="btn btn-line btn-small" onclick="logout()">Logout</button></div>
+<div style="display:flex;gap:8px"><span id="badge" class="badge badge-green">Secure</span><button class="btn btn-line btn-small" onclick="logout()">Logout</button></div>
 </div>
 <div class="layout">
 <div class="side" id="side"></div>
@@ -102,45 +92,64 @@ harold@schoolstack / admin123 • admin@sobukhazi / admin123<br>teacher@sobukhaz
 </div>
 
 <script>
+// SECURE v13 — NO PASSWORDS IN CODE, NO CREDENTIALS DISPLAYED, SUPABASE ONLY
 var currentRole='', currentUser=null;
-var USERS=[
-  {email:'harold@schoolstack',pass:'admin123',role:'maintainer',name:'Harold Manduna'},
-  {email:'admin@sobukhazi',pass:'admin123',role:'admin',name:'Admin Office'},
-  {email:'teacher@sobukhazi',pass:'teacher123',role:'teacher',name:'Mr Ncube'},
-  {email:'parent@sobukhazi',pass:'parent123',role:'parent',name:'Parent Dube'}
-];
+var ROLE_EMAILS={
+  maintainer: 'harold@schoolstack',
+  admin: 'admin@sobukhazi',
+  teacher: 'teacher@sobukhazi',
+  parent: 'parent@sobukhazi'
+};
 var cachedStudents=[], uploadedImageBase64='', bulkSubjects=['English','Mathematics','Combined Science','Heritage','Ndebele'];
-var bulkData=[];
+var bulkData=[], parsedCSV=[];
 
 function showMsg(t,err){ var m=document.getElementById('msg'); if(m){ m.textContent=t; m.style.color=err?'#DC2626':'#166534'; } }
 function showErr(t){ var e=document.getElementById('err'); if(e){ e.style.display='block'; e.textContent=t; } showMsg(t,true); }
 function hideErr(){ var e=document.getElementById('err'); if(e) e.style.display='none'; }
+
 function pick(r){
   currentRole=r;
   document.querySelectorAll('.role').forEach(function(b){ b.classList.remove('on'); });
   var btn=document.getElementById('r-'+r); if(btn) btn.classList.add('on');
-  for(var i=0;i<USERS.length;i++){ if(USERS[i].role===r){ document.getElementById('email').value=USERS[i].email; document.getElementById('pass').value=USERS[i].pass; break; } }
-  showMsg('Selected '+r); hideErr();
+  var emailInput=document.getElementById('email');
+  if(emailInput && ROLE_EMAILS[r]) emailInput.value=ROLE_EMAILS[r];
+  var passInput=document.getElementById('pass');
+  if(passInput) passInput.value='';
+  if(passInput) passInput.focus();
+  showMsg('Selected '+r+' — enter password'); hideErr();
 }
+
 function login(){
   hideErr();
   var email=(document.getElementById('email').value||'').trim().toLowerCase();
   var pass=(document.getElementById('pass').value||'').trim();
   var btn=document.getElementById('btnLogin');
-  if(!email||!pass){ showErr('Enter email and password'); return; }
-  if(btn){ btn.textContent='Logging in...'; btn.disabled=true; }
-  showMsg('Checking Supabase...');
-  fetch('/api/portal/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:pass,project_slug:'sobukhazi-high-school'})}).then(function(r){return r.json().then(function(d){return {s:r.status,d:d}})}).then(function(res){
-    if(res.d && res.d.success){
-      currentUser={email:res.d.user.email,role:res.d.user.role,name:res.d.user.name}; currentRole=res.d.user.role;
-      if(btn){ btn.textContent='Login via Supabase →'; btn.disabled=false; } openApp();
+  if(!email||!pass){ showErr('Enter email and password — contact admin for credentials'); return; }
+  if(btn){ btn.textContent='Verifying via Supabase...'; btn.disabled=true; }
+  showMsg('Checking Supabase (secure)...');
+  
+  fetch('/api/portal/login',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email:email,password:pass,project_slug:'sobukhazi-high-school'})
+  }).then(function(r){
+    return r.json().then(function(d){ return {status:r.status, data:d}; });
+  }).then(function(res){
+    if(res.data && res.data.success && res.data.user){
+      currentUser={email:res.data.user.email,role:res.data.user.role,name:res.data.user.name};
+      currentRole=res.data.user.role;
+      if(btn){ btn.textContent='Secure Login →'; btn.disabled=false; }
+      openApp();
     }else{
-      var found=false; for(var i=0;i<USERS.length;i++){ if(USERS[i].email===email && USERS[i].pass===pass){ currentUser={email:USERS[i].email,role:USERS[i].role,name:USERS[i].name}; currentRole=USERS[i].role; found=true; break; } }
-      if(found){ if(btn){btn.textContent='Login via Supabase →'; btn.disabled=false;} openApp(); }
-      else{ showErr('Invalid: '+(res.d.error||'no user')); if(btn){btn.textContent='Login via Supabase →'; btn.disabled=false;} }
+      showErr('Invalid credentials — '+ (res.data.error||'check email/password') +'. Contact admin.');
+      if(btn){ btn.textContent='Secure Login →'; btn.disabled=false; }
     }
-  }).catch(function(e){ showErr('Network: '+e.message+' — Try FORCE LOGIN'); if(btn){btn.textContent='Login via Supabase →'; btn.disabled=false;} });
+  }).catch(function(e){
+    showErr('Network error: '+e.message+'. Check internet or contact admin.');
+    if(btn){ btn.textContent='Secure Login →'; btn.disabled=false; }
+  });
 }
+
 function openApp(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('appScreen').style.display='block';
@@ -156,6 +165,7 @@ function logout(){
   document.getElementById('appScreen').style.display='none';
   document.getElementById('loginScreen').style.display='flex';
   hideErr(); document.getElementById('msg').textContent='';
+  var btn=document.getElementById('btnLogin'); if(btn){ btn.textContent='Secure Login →'; btn.disabled=false; }
 }
 function getMenu(role){
   var base=[{id:'dash',label:'🏠 Dashboard'},{id:'ann',label:'📰 News'}];
@@ -165,7 +175,7 @@ function getMenu(role){
       {id:'students',label:'👨‍🎓 Students'},
       {id:'addstudent',label:'➕ Add Student'},
       {id:'results',label:'📊 Results'},
-      {id:'bulkresults',label:'⚡ Bulk Results (Fast)'},
+      {id:'bulkresults',label:'⚡ Bulk Results'},
       {id:'users',label:'👥 Users'},
       {id:'late',label:'⏰ Late'}
     ]);
@@ -175,7 +185,7 @@ function getMenu(role){
       {id:'students',label:'👨‍🎓 My Students'},
       {id:'addstudent',label:'➕ Add Student'},
       {id:'results',label:'📊 Results'},
-      {id:'bulkresults',label:'⚡ Bulk Results (Fast)'},
+      {id:'bulkresults',label:'⚡ Bulk Results'},
       {id:'late',label:'⏰ Mark Late'}
     ]);
   }
@@ -189,7 +199,7 @@ function render(){
   var side=document.getElementById('side');
   var html='';
   for(var i=0;i<menu.length;i++){ html+='<div class="tab" id="tab-'+menu[i].id+'" onclick="view(\''+menu[i].id+'\')">'+menu[i].label+'</div>'; }
-  html+='<div style="margin-top:12px;padding:8px;background:#F5F5F4;border-radius:8px;font-size:11px;color:#78716C">Production v12<br>No test data<br>Role: '+currentRole+'<br>Bulk entry</div>';
+  html+='<div style="margin-top:12px;padding:8px;background:#F5F5F4;border-radius:8px;font-size:11px;color:#78716C">Secure v13<br>Supabase only<br>Role: '+currentRole+'<br>No passwords displayed</div>';
   side.innerHTML=html;
   view(menu[0].id);
 }
@@ -198,51 +208,41 @@ function view(id){
     document.querySelectorAll('.side .tab').forEach(function(t){ t.classList.toggle('on', t.id==='tab-'+id); });
     var main=document.getElementById('main');
     if(id==='dash'){
-      main.innerHTML='<h2>Dashboard • '+currentRole+'</h2><div class="grid2" style="margin-top:12px"><div class="card"><b>Welcome '+(currentUser?currentUser.name:'')+'</b><br><span style="font-size:12px;color:#78716C">Sobukhazi High — Old Fall Rd, Mzilikazi<br><br><b>Production v12 — Pitch Ready:</b><br>✅ No fake test data — clean start<br>✅ Teacher adds student + parent (auto parent login)<br>✅ Bulk results: spreadsheet for whole class<br>✅ CSV paste from Excel<br>✅ Auto grades (A-U)<br>✅ Parent sees ONLY their child<br>✅ Admin posts updates with images<br>✅ Supabase only, no localStorage</span><br><br><a href="index.html" target="_blank" style="color:#166534;font-weight:700">View Website →</a></div><div class="card"><b>Live Counts (Supabase)</b><div style="font-size:12px;color:#78716C;margin-top:8px"><div>Students: <span id="cStu">—</span></div><div>Results: <span id="cRes">—</span></div><div>Users: <span id="cUsers">—</span></div><div>Announcements: <span id="cAnn">—</span></div></div><div style="margin-top:12px"><button class="btn btn-line btn-small" onclick="view(\'bulkresults\')">⚡ Try Bulk Results →</button></div></div></div>';
+      main.innerHTML='<h2>Dashboard • '+currentRole+'</h2><div class="grid2" style="margin-top:12px"><div class="card"><b>Welcome '+(currentUser?currentUser.name:'')+'</b><br><span style="font-size:12px;color:#78716C">Sobukhazi High — Old Fall Rd, Mzilikazi<br><br><b>Secure v13 Production:</b><br>✅ No passwords on login page<br>✅ Supabase authentication only<br>✅ Parent sees ONLY own child<br>✅ Bulk results 2 mins<br>✅ Image updates<br>✅ No test data</span><br><br><a href="index.html" target="_blank" style="color:#166534;font-weight:700">View Website →</a></div><div class="card"><b>Live Counts (Supabase)</b><div style="font-size:12px;color:#78716C;margin-top:8px"><div>Students: <span id="cStu">—</span></div><div>Results: <span id="cRes">—</span></div><div>Users: <span id="cUsers">—</span></div><div>Announcements: <span id="cAnn">—</span></div></div><div style="margin-top:12px"><button class="btn btn-line btn-small" onclick="view(\'bulkresults\')">⚡ Bulk Results →</button></div></div></div>';
       fetch('/api/students?project_slug=sobukhazi-high-school&limit=100').then(function(r){return r.json();}).then(function(d){ var el=document.getElementById('cStu'); if(el) el.textContent=Array.isArray(d)?d.length:'0'; }).catch(function(){});
       fetch('/api/results?project_slug=sobukhazi-high-school&limit=100').then(function(r){return r.json();}).then(function(d){ var el=document.getElementById('cRes'); if(el) el.textContent=Array.isArray(d)?d.length:'0'; }).catch(function(){});
       fetch('/api/portal/users?project_slug=sobukhazi-high-school&limit=100').then(function(r){return r.json();}).then(function(d){ var el=document.getElementById('cUsers'); if(el) el.textContent=Array.isArray(d)?d.length:'0'; }).catch(function(){});
       fetch('/api/announcements?project_slug=sobukhazi-high-school&limit=5').then(function(r){return r.json();}).then(function(d){ var el=document.getElementById('cAnn'); if(el) el.textContent=Array.isArray(d)?d.length:'0'; }).catch(function(){});
-
     }else if(id==='ann'){
       main.innerHTML='<h2>News (Website)</h2><div id="annList" class="list" style="margin-top:12px">Loading...</div>';
       fetch('/api/announcements?project_slug=sobukhazi-high-school&limit=20').then(function(r){return r.json();}).then(function(data){
         var html=''; if(Array.isArray(data) && data.length>0){ for(var i=0;i<data.length;i++){ var a=data[i]; html+='<div class="card" style="border-left:4px solid #166534"><div style="font-size:11px;color:#78716C">'+new Date(a.created_at).toLocaleDateString()+' • '+a.category+'</div><b>'+a.title+'</b><div style="font-size:13px;color:#57534E;margin-top:6px;white-space:pre-wrap">'+a.content.slice(0,400)+'</div>'+(a.image_url?'<img src="'+a.image_url+'" style="margin-top:10px;max-width:100%;border-radius:10px;max-height:300px">':'')+'</div>'; } }else html='<div class="card">No news yet — Admin posts updates with images here. Production clean.</div>';
         document.getElementById('annList').innerHTML=html;
       });
-
     }else if(id==='post'){
       main.innerHTML='<h2>📸 Post Update with Image → Website</h2><div class="card" style="margin-top:12px;max-width:600px"><div style="display:grid;gap:12px"><input id="aTitle" class="input" placeholder="Title"><select id="aCat" class="input"><option>GENERAL</option><option>ACADEMICS</option><option>SPORTS</option><option>EVENTS</option></select><textarea id="aContent" class="input" style="height:120px" placeholder="Update content..."></textarea><div><label style="font-size:12px;font-weight:700">Upload Image</label><input type="file" id="aFile" accept="image/*" class="input" style="margin-top:6px" onchange="handleImageUpload(this)"><input id="aImg" class="input" placeholder="Or paste image URL https://..." style="margin-top:6px"><img id="aPreview" class="preview-img" style="display:none"><div id="aImgStatus" style="font-size:11px;color:#166534"></div></div><button class="btn btn-green" onclick="postAnn()">Post to Website</button><div id="aRes" style="font-size:12px"></div></div></div>';
-
     }else if(id==='students'){
       main.innerHTML='<h2>👨‍🎓 Students</h2><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><input id="sSearch" class="input" placeholder="Search name" style="max-width:200px"><select id="sClass" class="input" style="max-width:130px"><option value="">All Classes</option><option>1A</option><option>1B</option><option>2A</option><option>2B</option><option>3A</option><option>3B</option><option>4A</option><option>4B</option><option>5A</option><option>6A</option></select><button class="btn btn-green btn-small" onclick="loadStudents()">Search</button><button class="btn btn-line btn-small" onclick="view(\'addstudent\')">+ Add Student</button></div><div id="sList" class="list" style="margin-top:12px">Loading...</div>';
       loadStudents();
-
     }else if(id==='addstudent'){
       if(currentRole!=='teacher'&&currentRole!=='admin'&&currentRole!=='maintainer'){ main.innerHTML='<div class="card">Only teacher/admin</div>'; return; }
-      main.innerHTML='<h2>➕ Add Student + Parent (Production)</h2><div class="grid2" style="margin-top:12px"><div class="card"><b>Student</b><div style="display:grid;gap:8px;margin-top:10px"><input id="stName" class="input" placeholder="Full Name *"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><select id="stClass" class="input"><option>1A</option><option>1B</option><option>2A</option><option>2B</option><option>3A</option><option>3B</option><option>4A</option><option>4B</option><option>5A</option><option>5B</option><option>6A</option></select><select id="stGender" class="input"><option value="M">Male</option><option value="F">Female</option></select></div><input id="stEnroll" class="input" placeholder="Enrollment No auto if empty"><input id="stAddress" class="input" placeholder="Address"></div></div><div class="card"><b>Parent — Auto login created</b><div style="display:grid;gap:8px;margin-top:10px"><input id="stParentName" class="input" placeholder="Parent Full Name"><input id="stParentEmail" class="input" placeholder="Parent Email * (for parent portal)"><input id="stParentPhone" class="input" placeholder="Phone 2637..."><select id="stRel" class="input"><option>Parent</option><option>Mother</option><option>Father</option><option>Guardian</option></select><button class="btn btn-green" onclick="addStudent()">Add Student + Create Parent Account</button><div id="stRes" style="font-size:12px"></div><div style="font-size:11px;color:#78716C">Parent gets auto account and sees ONLY this child.</div></div></div></div>';
-
+      main.innerHTML='<h2>➕ Add Student + Parent (Production)</h2><div class="grid2" style="margin-top:12px"><div class="card"><b>Student</b><div style="display:grid;gap:8px;margin-top:10px"><input id="stName" class="input" placeholder="Full Name *"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><select id="stClass" class="input"><option>1A</option><option>1B</option><option>2A</option><option>2B</option><option>3A</option><option>3B</option><option>4A</option><option>4B</option><option>5A</option><option>5B</option><option>6A</option></select><select id="stGender" class="input"><option value="M">Male</option><option value="F">Female</option></select></div><input id="stEnroll" class="input" placeholder="Enrollment No auto if empty"><input id="stAddress" class="input" placeholder="Address"></div></div><div class="card"><b>Parent — Auto login created (private)</b><div style="display:grid;gap:8px;margin-top:10px"><input id="stParentName" class="input" placeholder="Parent Full Name"><input id="stParentEmail" class="input" placeholder="Parent Email * (for parent portal)"><input id="stParentPhone" class="input" placeholder="Phone 2637..."><select id="stRel" class="input"><option>Parent</option><option>Mother</option><option>Father</option><option>Guardian</option></select><button class="btn btn-green" onclick="addStudent()">Add Student + Create Parent Account</button><div id="stRes" style="font-size:12px"></div><div style="font-size:11px;color:#78716C">Parent gets private account and sees ONLY this child.</div></div></div></div>';
     }else if(id==='results'){
       var isParent=currentRole==='parent';
       main.innerHTML='<h2>📊 '+(isParent?'My Child Results':'Term Results')+'</h2><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'+(isParent?'':'<input id="rSearch" class="input" placeholder="Search student" style="max-width:180px">')+'<select id="rTerm" class="input" style="max-width:110px"><option value="">All Terms</option><option>Term 1</option><option>Term 2</option><option>Term 3</option></select><select id="rClass" class="input" style="max-width:110px"><option value="">All Classes</option><option>1A</option><option>2A</option><option>3B</option><option>4A</option></select><button class="btn btn-green btn-small" onclick="loadResults()">Filter</button>'+(isParent?'':'<button class="btn btn-line btn-small" onclick="view(\'bulkresults\')">⚡ Bulk Entry</button>')+'</div><div id="resList" class="list" style="margin-top:12px">Loading...</div>';
       loadResults();
-
     }else if(id==='bulkresults'){
       if(currentRole!=='teacher'&&currentRole!=='admin'&&currentRole!=='maintainer'){ main.innerHTML='<div class="card">Only teacher/admin</div>'; return; }
-      main.innerHTML='<h2>⚡ Bulk Results — Zero Extra Work</h2><div class="tabs" style="margin-top:12px"><button class="on" id="tab-sheet" onclick="switchBulkTab(\'sheet\')">📊 Spreadsheet (Class)</button><button id="tab-csv" onclick="switchBulkTab(\'csv\')">📋 Paste from Excel / CSV</button></div><div id="bulk-sheet"><div class="card"><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px"><select id="bClass" class="input"><option>3B</option><option>4A</option><option>2A</option><option>1A</option><option>1B</option><option>2B</option><option>3A</option><option>4B</option><option>5A</option><option>5B</option></select><select id="bTerm" class="input"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select><input id="bYear" class="input" type="number" value="2026"><button class="btn btn-line btn-small" onclick="loadBulkSheet()">Load Class →</button></div><div style="margin-top:10px"><label style="font-size:12px;font-weight:700">Subjects (comma separated — teacher can edit)</label><input id="bSubjects" class="input" value="English, Mathematics, Combined Science, Heritage, Ndebele" style="margin-top:4px"><div style="font-size:11px;color:#78716C;margin-top:4px">Grades auto: A 80+, B 70+, C 60+, D 50+, E 40+, U &lt;40</div></div></div><div id="bulkGrid" style="margin-top:12px"></div><div id="bulkActions" style="margin-top:12px;display:none"><div class="card"><div style="display:grid;gap:8px;max-width:500px"><input id="bTotalStudents" class="input" type="number" placeholder="Total students in class for position e.g. 45"><textarea id="bGeneralComment" class="input" placeholder="General teacher comment for all (optional, can override per student)"></textarea><button class="btn btn-green" onclick="publishBulk()">⚡ Publish All Results → Parents Notified</button><div id="bRes" style="font-size:12px"></div></div></div></div></div><div id="bulk-csv" style="display:none"><div class="card"><b>📋 Paste from Excel / Google Sheets</b><div style="font-size:12px;color:#78716C;margin-top:6px">Copy from Excel: Name [TAB] English [TAB] Maths [TAB] Science [TAB] Comment<br>Or CSV: Name, English, Maths, Science, Comment<br>First row can be header — system auto-detects</div><textarea id="csvInput" class="input" style="height:160px;margin-top:10px" placeholder="Name	English	Mathematics	Science	Comment&#10;John Doe	78	85	72	Good progress&#10;Jane Smith	82	90	88	Excellent"></textarea><div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-top:8px"><select id="csvClass" class="input"><option>3B</option><option>4A</option><option>2A</option></select><select id="csvTerm" class="input"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select><input id="csvYear" class="input" type="number" value="2026"><button class="btn btn-green btn-small" onclick="parseCSV()">Parse → Preview</button></div><div id="csvPreview" style="margin-top:12px"></div><div id="csvActions" style="display:none;margin-top:12px"><button class="btn btn-green" onclick="publishCSV()">Publish Parsed Results</button><div id="csvRes" style="font-size:12px;margin-top:8px"></div></div></div></div>';
-
+      main.innerHTML='<h2>⚡ Bulk Results — Zero Extra Work</h2><div class="tabs" style="margin-top:12px"><button class="on" id="tab-sheet" onclick="switchBulkTab(\'sheet\')">📊 Spreadsheet (Class)</button><button id="tab-csv" onclick="switchBulkTab(\'csv\')">📋 Paste from Excel / CSV</button></div><div id="bulk-sheet"><div class="card"><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px"><select id="bClass" class="input"><option>3B</option><option>4A</option><option>2A</option><option>1A</option><option>1B</option><option>2B</option><option>3A</option><option>4B</option><option>5A</option><option>5B</option></select><select id="bTerm" class="input"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select><input id="bYear" class="input" type="number" value="2026"><button class="btn btn-line btn-small" onclick="loadBulkSheet()">Load Class →</button></div><div style="margin-top:10px"><label style="font-size:12px;font-weight:700">Subjects (comma separated)</label><input id="bSubjects" class="input" value="English, Mathematics, Combined Science, Heritage, Ndebele" style="margin-top:4px"><div style="font-size:11px;color:#78716C;margin-top:4px">Grades auto: A 80+, B 70+, C 60+, D 50+, E 40+, U &lt;40</div></div></div><div id="bulkGrid" style="margin-top:12px"></div><div id="bulkActions" style="margin-top:12px;display:none"><div class="card"><div style="display:grid;gap:8px;max-width:500px"><input id="bTotalStudents" class="input" type="number" placeholder="Total students in class e.g. 45"><textarea id="bGeneralComment" class="input" placeholder="General teacher comment for all"></textarea><button class="btn btn-green" onclick="publishBulk()">⚡ Publish All Results → Parents Notified (private)</button><div id="bRes" style="font-size:12px"></div></div></div></div></div><div id="bulk-csv" style="display:none"><div class="card"><b>📋 Paste from Excel / Google Sheets</b><div style="font-size:12px;color:#78716C;margin-top:6px">Copy from Excel: Name [TAB] English [TAB] Maths [TAB] Science [TAB] Comment<br>Or CSV: Name, English, Maths, Science, Comment</div><textarea id="csvInput" class="input" style="height:160px;margin-top:10px" placeholder="Name	English	Mathematics	Science	Comment\nJohn Doe	78	85	72	Good progress"></textarea><div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-top:8px"><select id="csvClass" class="input"><option>3B</option><option>4A</option><option>2A</option></select><select id="csvTerm" class="input"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select><input id="csvYear" class="input" type="number" value="2026"><button class="btn btn-green btn-small" onclick="parseCSV()">Parse → Preview</button></div><div id="csvPreview" style="margin-top:12px"></div><div id="csvActions" style="display:none;margin-top:12px"><button class="btn btn-green" onclick="publishCSV()">Publish Parsed Results</button><div id="csvRes" style="font-size:12px;margin-top:8px"></div></div></div></div>';
     }else if(id==='users'){
-      main.innerHTML='<h2>👥 Users</h2><div class="grid2" style="margin-top:12px"><div class="card"><b>Add User</b><div style="display:grid;gap:8px;margin-top:8px"><input id="uName" class="input" placeholder="Name"><input id="uEmail" class="input" placeholder="Email"><input id="uPass" class="input" placeholder="Password"><input id="uPhone" class="input" placeholder="Phone"><select id="uRole" class="input"><option value="teacher">Teacher</option><option value="parent">Parent</option><option value="admin">Admin</option></select><button class="btn btn-green" onclick="addUser()">Add to Supabase</button><div id="uRes" style="font-size:12px"></div></div></div><div class="card"><b>Existing Users</b><div id="uList" class="list" style="margin-top:8px">Loading...</div></div></div>';
+      main.innerHTML='<h2>👥 Users (Supabase — passwords hidden)</h2><div class="grid2" style="margin-top:12px"><div class="card"><b>Add User (secure)</b><div style="display:grid;gap:8px;margin-top:8px"><input id="uName" class="input" placeholder="Name"><input id="uEmail" class="input" placeholder="Email"><input id="uPass" class="input" type="password" placeholder="Password (private)"><input id="uPhone" class="input" placeholder="Phone"><select id="uRole" class="input"><option value="teacher">Teacher</option><option value="parent">Parent</option><option value="admin">Admin</option></select><button class="btn btn-green" onclick="addUser()">Add to Supabase</button><div id="uRes" style="font-size:12px"></div></div></div><div class="card"><b>Existing Users (emails only, passwords hidden)</b><div id="uList" class="list" style="margin-top:8px">Loading...</div></div></div>';
       loadUsers();
-
     }else if(id==='late'){
       main.innerHTML='<h2>⏰ Late Arrivals</h2><div class="card" style="margin-top:12px"><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px"><select id="lStu" class="input"><option>Select student</option></select><input id="lTime" type="time" class="input"><select id="lReason" class="input"><option>traffic</option><option>transport</option><option>illness</option></select><input id="lDet" class="input" placeholder="Details"><button class="btn btn-green btn-small" onclick="markLate()">Save</button></div><div id="lRes" style="font-size:12px;margin-top:8px"></div></div><div class="card" style="margin-top:12px"><b>Today</b><div id="lList" class="list" style="margin-top:8px">Loading...</div></div>';
       setTimeout(function(){ var n=new Date(); var el=document.getElementById('lTime'); if(el) el.value=n.toTimeString().slice(0,5); loadLates(); loadStudentsForLate(); },100);
-
     }else if(id==='child'){
-      main.innerHTML='<h2>👶 My Child</h2><div id="childInfo" class="card" style="margin-top:12px">Loading...</div><div class="card" style="margin-top:12px"><b>Results — Only Your Child</b><div id="childResults" class="list" style="margin-top:8px">Loading...</div></div><div class="card" style="margin-top:12px"><b>Notifications</b><div id="pNotifs" class="list" style="margin-top:8px">Loading...</div></div>';
+      main.innerHTML='<h2>👶 My Child (Private)</h2><div id="childInfo" class="card" style="margin-top:12px">Loading...</div><div class="card" style="margin-top:12px"><b>Results — Only Your Child (private)</b><div id="childResults" class="list" style="margin-top:8px">Loading...</div></div><div class="card" style="margin-top:12px"><b>Notifications (private)</b><div id="pNotifs" class="list" style="margin-top:8px">Loading...</div></div>';
       loadChildData();
-
     }else if(id==='notif'){
       main.innerHTML='<h2>🔔 Notifications</h2><div id="nList" class="list" style="margin-top:12px">Loading...</div>';
       loadNotifs();
@@ -250,7 +250,6 @@ function view(id){
   }catch(e){ document.getElementById('main').innerHTML='<div class="card">Error: '+e.message+'</div>'; }
 }
 
-// HELPERS
 function gradeFromScore(s){ s=parseInt(s)||0; if(s>=80) return 'A'; if(s>=70) return 'B'; if(s>=60) return 'C'; if(s>=50) return 'D'; if(s>=40) return 'E'; return 'U'; }
 
 function loadStudents(){
@@ -264,8 +263,8 @@ function loadStudents(){
     cachedStudents=data||[];
     var html='';
     if(cachedStudents.length>0){
-      for(var i=0;i<cachedStudents.length;i++){ var s=cachedStudents[i]; html+='<div class="card" style="padding:12px"><div style="display:flex;justify-content:space-between;flex-wrap:wrap"><div><b>'+s.name+'</b> • '+s.class_name+'<br><span style="font-size:11px;color:#78716C">Parent: '+(s.parent_name||'—')+' • '+(s.parent_email||'')+' • '+(s.parent_phone||'')+'<br>Enroll: '+(s.enrollment_no||'')+'</span></div><div><span class="badge badge-gray">'+(s.gender||'')+'</span></div></div></div>'; }
-    }else html='<div class="card"><b>No students yet</b><br><span style="font-size:12px;color:#78716C">Production clean — Teacher adds real students via ➕ Add Student. No fake data.</span><br><br><button class="btn btn-green btn-small" onclick="view(\'addstudent\')">+ Add First Student</button></div>';
+      for(var i=0;i<cachedStudents.length;i++){ var s=cachedStudents[i]; html+='<div class="card" style="padding:12px"><div style="display:flex;justify-content:space-between"><div><b>'+s.name+'</b> • '+s.class_name+'<br><span style="font-size:11px;color:#78716C">Parent: '+(s.parent_name||'—')+' • '+(s.parent_email||'')+' • '+(s.parent_phone||'')+'<br>Enroll: '+(s.enrollment_no||'')+'</span></div></div></div>'; }
+    }else html='<div class="card"><b>No students yet</b><br><span style="font-size:12px;color:#78716C">Production clean — Teacher adds real students via ➕ Add Student.</span><br><br><button class="btn btn-green btn-small" onclick="view(\'addstudent\')">+ Add First Student</button></div>';
     document.getElementById('sList').innerHTML=html;
   });
 }
@@ -291,11 +290,11 @@ function addStudent(){
   if(resEl) resEl.textContent='Saving to Supabase...';
   fetch('/api/students',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',name:name,class_name:className,gender:gender,enrollment_no:enroll,address:addr,parent_name:pName,parent_email:pEmail,parent_phone:pPhone,parent_relationship:rel,created_by:currentUser?currentUser.email:'',created_by_name:currentUser?currentUser.name:''})}).then(function(r){return r.json();}).then(function(d){
     if(d.error){ if(resEl) resEl.textContent='Error: '+d.error; }
-    else{ if(resEl) resEl.textContent='✅ Added '+name+' ('+className+') Enroll '+enroll+' — Parent '+(pEmail?'account created for '+pEmail:'no email — add later') ; document.getElementById('stName').value=''; document.getElementById('stParentEmail').value=''; }
+    else{ if(resEl) resEl.textContent='✅ Added '+name+' ('+className+') — Parent account created (private)'; document.getElementById('stName').value=''; }
   }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
 }
 
-// BULK RESULTS — SPREADSHEET
+// BULK RESULTS
 function switchBulkTab(tab){
   document.getElementById('bulk-sheet').style.display=tab==='sheet'?'block':'none';
   document.getElementById('bulk-csv').style.display=tab==='csv'?'block':'none';
@@ -310,10 +309,8 @@ function loadBulkSheet(){
   document.getElementById('bulkGrid').innerHTML='<div class="card">Loading students for '+className+'...</div>';
   fetch('/api/students?project_slug=sobukhazi-high-school&class_name='+encodeURIComponent(className)+'&limit=100').then(function(r){return r.json();}).then(function(students){
     if(!students || students.length===0){
-      // Allow manual entry if no students yet
-      document.getElementById('bulkGrid').innerHTML='<div class="card"><b>No students in '+className+' yet</b><br><span style="font-size:12px;color:#78716C">Add students first or enter names manually below.</span><br><br><div style="display:flex;gap:8px"><input id="manualNames" class="input" placeholder="Enter names comma separated: John Doe, Jane Smith"><button class="btn btn-line btn-small" onclick="createManualBulk()">Create Sheet</button></div></div>';
-      document.getElementById('bulkActions').style.display='none';
-      return;
+      document.getElementById('bulkGrid').innerHTML='<div class="card"><b>No students in '+className+' yet</b><br><span style="font-size:12px;color:#78716C">Add students first or enter names manually.</span><br><br><div style="display:flex;gap:8px"><input id="manualNames" class="input" placeholder="John Doe, Jane Smith"><button class="btn btn-line btn-small" onclick="createManualBulk()">Create Sheet</button></div></div>';
+      document.getElementById('bulkActions').style.display='none'; return;
     }
     bulkData=students.map(function(s){ return {student_name:s.name, id:s.id, scores:{}, comment:'', position:''}; });
     renderBulkGrid();
@@ -334,8 +331,7 @@ function renderBulkGrid(){
     var row=bulkData[r];
     html+='<tr><td><b style="font-size:12px">'+row.student_name+'</b></td>';
     for(var c=0;c<bulkSubjects.length;c++){
-      var subj=bulkSubjects[c];
-      var val=row.scores[subj]||'';
+      var subj=bulkSubjects[c]; var val=row.scores[subj]||'';
       html+='<td><input type="number" min="0" max="100" data-row="'+r+'" data-subj="'+subj+'" value="'+val+'" placeholder="0-100" oninput="updateBulkScore(this)"></td>';
     }
     html+='<td><span id="avg-'+r+'" style="font-size:12px;font-weight:700">—</span></td>';
@@ -345,25 +341,19 @@ function renderBulkGrid(){
   html+='</tbody></table></div>';
   document.getElementById('bulkGrid').innerHTML=html;
   document.getElementById('bulkActions').style.display='block';
-  // calc avgs
   for(var k=0;k<bulkData.length;k++) calcRowAvg(k);
 }
 function updateBulkScore(el){
-  var row=parseInt(el.getAttribute('data-row'));
-  var subj=el.getAttribute('data-subj');
-  var val=el.value;
+  var row=parseInt(el.getAttribute('data-row')); var subj=el.getAttribute('data-subj');
   if(!bulkData[row].scores) bulkData[row].scores={};
-  bulkData[row].scores[subj]=val;
-  calcRowAvg(row);
+  bulkData[row].scores[subj]=el.value; calcRowAvg(row);
 }
 function updateBulkField(el){
-  var row=parseInt(el.getAttribute('data-row'));
-  var field=el.getAttribute('data-field');
+  var row=parseInt(el.getAttribute('data-row')); var field=el.getAttribute('data-field');
   bulkData[row][field]=el.value;
 }
 function calcRowAvg(rowIdx){
-  var scores=bulkData[rowIdx].scores;
-  var total=0, count=0;
+  var scores=bulkData[rowIdx].scores; var total=0, count=0;
   for(var key in scores){ var v=parseInt(scores[key]); if(!isNaN(v) && scores[key]!=='' ){ total+=v; count++; } }
   var avg=count? (total/count).toFixed(1) : '—';
   var el=document.getElementById('avg-'+rowIdx);
@@ -373,122 +363,75 @@ function publishBulk(){
   var className=(document.getElementById('bClass')||{}).value||'';
   var term=(document.getElementById('bTerm')||{}).value||'';
   var year=(document.getElementById('bYear')||{}).value||'2026';
-  var totalStudents=(document.getElementById('bTotalStudents')||{}).value||'';
   var generalComment=(document.getElementById('bGeneralComment')||{}).value||'';
   var resEl=document.getElementById('bRes');
-  // Prepare results
   var results=[];
   for(var i=0;i<bulkData.length;i++){
-    var r=bulkData[i];
-    var hasScore=false; for(var k in r.scores){ if(r.scores[k]!=='' && !isNaN(r.scores[k])){ hasScore=true; break; } }
+    var r=bulkData[i]; var hasScore=false; for(var k in r.scores){ if(r.scores[k]!=='' && !isNaN(r.scores[k])){ hasScore=true; break; } }
     if(!hasScore) continue;
-    results.push({
-      student_name:r.student_name,
-      scores:r.scores,
-      teacher_comment:r.comment||generalComment,
-      position:r.position||'',
-      conduct:'',
-      attendance_pct:''
-    });
+    results.push({student_name:r.student_name, scores:r.scores, teacher_comment:r.comment||generalComment, position:r.position||''});
   }
   if(results.length===0){ if(resEl) resEl.textContent='No scores entered'; return; }
-  if(resEl) resEl.textContent='Publishing '+results.length+' results to Supabase...';
-  fetch('/api/results/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',class_name:className,term:term,year:year,subjects_list:bulkSubjects,results:results,created_by:currentUser?currentUser.email:'',created_by_name:currentUser?currentUser.name:'',total_students:totalStudents})}).then(function(r){return r.json();}).then(function(d){
+  if(resEl) resEl.textContent='Publishing '+results.length+' results...';
+  fetch('/api/results/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',class_name:className,term:term,year:year,subjects_list:bulkSubjects,results:results,created_by:currentUser?currentUser.email:'',created_by_name:currentUser?currentUser.name:''})}).then(function(r){return r.json();}).then(function(d){
     if(d.error){ if(resEl) resEl.textContent='Error: '+d.error; }
-    else{ if(resEl) resEl.textContent='✅ Published '+d.count+' results for '+className+' '+term+' — Parents notified (only their child)'; }
+    else{ if(resEl) resEl.textContent='✅ Published '+d.count+' results — Parents notified private'; }
   }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
 }
-
-// CSV PASTE
-var parsedCSV=[];
 function parseCSV(){
   var text=(document.getElementById('csvInput')||{}).value||'';
-  var className=(document.getElementById('csvClass')||{}).value||'';
-  var lines=text.trim().split('\n');
-  if(lines.length<1){ alert('Paste data'); return; }
-  var firstLine=lines[0].trim();
-  var delimiter=firstLine.indexOf('\t')>-1 ? '\t' : ',';
+  var lines=text.trim().split('\n'); if(lines.length<1){ alert('Paste data'); return; }
+  var firstLine=lines[0].trim(); var delimiter=firstLine.indexOf('\t')>-1 ? '\t' : ',';
   var headers=firstLine.split(delimiter).map(function(h){return h.trim().toLowerCase();});
-  var hasHeader=headers[0].indexOf('name')>-1 || headers[1] && (headers[1].indexOf('english')>-1 || headers[1].indexOf('math')>-1);
-  var startIdx=hasHeader?1:0;
-  var subjHeaders=hasHeader? headers.slice(1) : [];
-  // If no header, assume subjects from bulkSubjects
-  if(!hasHeader){ subjHeaders=bulkSubjects.map(function(s){return s.toLowerCase();}); subjHeaders.push('comment'); }
-  // Normalize subject headers to proper case
-  var subjectMap={}; // lower -> proper
-  for(var i=0;i<bulkSubjects.length;i++){ subjectMap[bulkSubjects[i].toLowerCase()]=bulkSubjects[i]; }
-  // Also common variations
-  subjectMap['english']= 'English'; subjectMap['mathematics']='Mathematics'; subjectMap['maths']='Mathematics'; subjectMap['math']='Mathematics';
-  subjectMap['science']='Combined Science'; subjectMap['combined science']='Combined Science'; subjectMap['heritage']='Heritage'; subjectMap['ndebele']='Ndebele';
-
+  var hasHeader=headers[0].indexOf('name')>-1;
+  var startIdx=hasHeader?1:0; var subjHeaders=hasHeader? headers.slice(1) : bulkSubjects.map(function(s){return s.toLowerCase();});
+  var subjectMap={}; for(var i=0;i<bulkSubjects.length;i++){ subjectMap[bulkSubjects[i].toLowerCase()]=bulkSubjects[i]; }
+  subjectMap['maths']='Mathematics'; subjectMap['math']='Mathematics';
   parsedCSV=[];
   for(var l=startIdx;l<lines.length;l++){
     var line=lines[l].trim(); if(!line) continue;
-    var parts=line.split(delimiter).map(function(p){return p.trim();});
-    if(parts.length<2) continue;
-    var name=parts[0];
-    var scores={}; var comment='';
+    var parts=line.split(delimiter).map(function(p){return p.trim();}); if(parts.length<2) continue;
+    var name=parts[0]; var scores={}; var comment='';
     for(var c=1;c<parts.length;c++){
-      var h=subjHeaders[c-1]||''; // header for this col
-      var val=parts[c];
-      if(!val) continue;
-      if(h.indexOf('comment')>-1 || h.indexOf('remark')>-1){ comment=val; }
+      var h=subjHeaders[c-1]||''; var val=parts[c]; if(!val) continue;
+      if(h.indexOf('comment')>-1){ comment=val; }
       else if(!isNaN(val) && val!=='' ){
-        // It's a score
-        var properSubj=subjectMap[h] || (h.charAt(0).toUpperCase()+h.slice(1));
-        // If header is generic like col1, map by position to bulkSubjects
-        if(!subjectMap[h] && bulkSubjects[c-1]) properSubj=bulkSubjects[c-1];
-        scores[properSubj]=val;
-      }else if(h && subjectMap[h]){
-        scores[subjectMap[h]]=val;
-      }else{
-        // last column maybe comment
-        if(c===parts.length-1 && isNaN(val)) comment=val;
-        else if(bulkSubjects[c-1]) scores[bulkSubjects[c-1]]=val;
-      }
+        var proper=subjectMap[h] || bulkSubjects[c-1] || h;
+        scores[proper]=val;
+      }else if(c===parts.length-1 && isNaN(val)) comment=val;
+      else if(bulkSubjects[c-1]) scores[bulkSubjects[c-1]]=val;
     }
     if(name) parsedCSV.push({student_name:name, scores:scores, teacher_comment:comment});
   }
-
   var previewEl=document.getElementById('csvPreview');
-  var html='<div class="sheet"><table><thead><tr><th>Name</th>';
-  // collect all subjects found
   var allSubs={}; for(var p=0;p<parsedCSV.length;p++){ for(var s in parsedCSV[p].scores) allSubs[s]=1; }
   var allSubsList=Object.keys(allSubs);
-  for(var a=0;a<allSubsList.length;a++) html+='<th>'+allSubsList[a]+'</th>';
-  html+='<th>Comment</th></tr></thead><tbody>';
+  var html='<div class="sheet"><table><thead><tr><th>Name</th>'; for(var a=0;a<allSubsList.length;a++) html+='<th>'+allSubsList[a]+'</th>'; html+='<th>Comment</th></tr></thead><tbody>';
   for(var r=0;r<parsedCSV.length;r++){ var row=parsedCSV[r]; html+='<tr><td><b style="font-size:12px">'+row.student_name+'</b></td>'; for(var b=0;b<allSubsList.length;b++){ var sub=allSubsList[b]; html+='<td>'+(row.scores[sub]||'—')+'</td>'; } html+='<td style="font-size:11px">'+(row.teacher_comment||'')+'</td></tr>'; }
-  html+='</tbody></table></div><div style="font-size:12px;color:#78716C;margin-top:8px">Parsed '+parsedCSV.length+' students — '+allSubsList.join(', ')+'</div>';
-  previewEl.innerHTML=html;
-  document.getElementById('csvActions').style.display=parsedCSV.length>0?'block':'none';
-  bulkSubjects=allSubsList.length>0?allSubsList:bulkSubjects;
+  html+='</tbody></table></div><div style="font-size:12px;color:#78716C;margin-top:8px">Parsed '+parsedCSV.length+' students</div>';
+  previewEl.innerHTML=html; document.getElementById('csvActions').style.display=parsedCSV.length>0?'block':'none'; bulkSubjects=allSubsList.length>0?allSubsList:bulkSubjects;
 }
 function publishCSV(){
   var className=(document.getElementById('csvClass')||{}).value||'';
   var term=(document.getElementById('csvTerm')||{}).value||'';
   var year=(document.getElementById('csvYear')||{}).value||'2026';
   var resEl=document.getElementById('csvRes');
-  if(parsedCSV.length===0){ if(resEl) resEl.textContent='No data parsed'; return; }
-  if(resEl) resEl.textContent='Publishing '+parsedCSV.length+' results...';
+  if(parsedCSV.length===0){ if(resEl) resEl.textContent='No data'; return; }
+  if(resEl) resEl.textContent='Publishing '+parsedCSV.length+'...';
   fetch('/api/results/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',class_name:className,term:term,year:year,subjects_list:bulkSubjects,results:parsedCSV,created_by:currentUser?currentUser.email:'',created_by_name:currentUser?currentUser.name:''})}).then(function(r){return r.json();}).then(function(d){
     if(d.error){ if(resEl) resEl.textContent='Error: '+d.error; }
-    else{ if(resEl) resEl.textContent='✅ Published '+d.count+' results — Parents notified (private)'; }
+    else{ if(resEl) resEl.textContent='✅ Published '+d.count+' results'; }
   }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
 }
 
-// OTHER FEATURES
 function loadResults(){
   var isParent=currentRole==='parent';
-  var searchEl=document.getElementById('rSearch');
-  var termEl=document.getElementById('rTerm');
-  var classEl=document.getElementById('rClass');
-  var search=searchEl?searchEl.value.trim():'';
-  var term=termEl?termEl.value:'';
-  var className=classEl?classEl.value:'';
+  var search=(document.getElementById('rSearch')||{}).value||'';
+  var term=(document.getElementById('rTerm')||{}).value||'';
+  var className=(document.getElementById('rClass')||{}).value||'';
   var url='/api/results?project_slug=sobukhazi-high-school&limit=100';
   if(isParent){
-    var email=currentUser?currentUser.email:'';
-    url+='&parent_email='+encodeURIComponent(email);
+    url+='&parent_email='+encodeURIComponent(currentUser?currentUser.email:'');
   }else{
     if(search) url+='&student_name='+encodeURIComponent(search);
     if(term) url+='&term='+encodeURIComponent(term);
@@ -501,10 +444,10 @@ function loadResults(){
     if(Array.isArray(data) && data.length>0){
       for(var i=0;i<data.length;i++){ var r=data[i];
         var subs=''; if(Array.isArray(r.subjects)){ for(var j=0;j<r.subjects.length;j++){ var s=r.subjects[j]; subs+='<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #F5F5F4"><span>'+(s.name||'')+'</span><span><b>'+(s.score||'')+'</b> '+(s.grade||'')+'</span></div>'; } }
-        html+='<div class="card"><div style="display:flex;justify-content:space-between"><div><b>'+r.student_name+'</b> • '+r.class_name+' • '+r.term+' '+r.year+'<br><span style="font-size:11px;color:#78716C">Avg: '+(r.average||'—')+'% • Total: '+(r.total||'—')+' • Pos: '+(r.position||'—')+' • By: '+(r.created_by_name||'')+'</span></div><span class="badge badge-green">Published</span></div><div style="margin-top:8px;background:#FAFAF9;border-radius:8px;padding:8px">'+subs+'</div><div style="margin-top:8px;font-size:12px"><b>Teacher:</b> '+(r.teacher_comment||'—')+'</div></div>';
+        html+='<div class="card"><div style="display:flex;justify-content:space-between"><div><b>'+r.student_name+'</b> • '+r.class_name+' • '+r.term+' '+r.year+'<br><span style="font-size:11px;color:#78716C">Avg: '+(r.average||'—')+'% • Total: '+(r.total||'—')+' • Pos: '+(r.position||'—')+'</span></div><span class="badge badge-green">Published</span></div><div style="margin-top:8px;background:#FAFAF9;border-radius:8px;padding:8px">'+subs+'</div><div style="margin-top:8px;font-size:12px"><b>Teacher:</b> '+(r.teacher_comment||'—')+'</div></div>';
       }
     }else{
-      html=isParent?'<div class="card"><b>No results yet for your child</b><br><span style="font-size:12px;color:#78716C">Teacher will publish end-of-term results. You will be notified and see only your child (private).</span></div>':'<div class="card"><b>No results yet</b><br><span style="font-size:12px;color:#78716C">Production clean — Use ⚡ Bulk Results to publish whole class in 2 minutes. No fake data.</span></div>';
+      html=isParent?'<div class="card"><b>No results yet for your child</b><br><span style="font-size:12px;color:#78716C">Teacher will publish — you will see ONLY your child (private).</span></div>':'<div class="card"><b>No results yet</b><br><span style="font-size:12px;color:#78716C">Production clean — Use ⚡ Bulk Results.</span></div>';
     }
     if(listEl) listEl.innerHTML=html;
   });
@@ -526,7 +469,7 @@ function postAnn(){
   var resEl=document.getElementById('aRes');
   if(!title||!content){ if(resEl) resEl.textContent='Title and content required'; return; }
   if(resEl) resEl.textContent='Posting...';
-  fetch('/api/announcements',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:title,content:content,category:cat,image_url:finalImage,author_name:currentUser?currentUser.name:'',project_slug:'sobukhazi-high-school'})}).then(function(r){return r.json();}).then(function(){ if(resEl) resEl.textContent='✅ Posted with image! On website News'; uploadedImageBase64=''; var p=document.getElementById('aPreview'); if(p) p.style.display='none'; }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
+  fetch('/api/announcements',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:title,content:content,category:cat,image_url:finalImage,author_name:currentUser?currentUser.name:'',project_slug:'sobukhazi-high-school'})}).then(function(r){return r.json();}).then(function(){ if(resEl) resEl.textContent='✅ Posted with image! On website News'; uploadedImageBase64=''; }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
 }
 function loadUsers(){
   fetch('/api/portal/users?project_slug=sobukhazi-high-school&limit=100').then(function(r){return r.json();}).then(function(data){
@@ -543,7 +486,7 @@ function addUser(){
   var resEl=document.getElementById('uRes');
   if(!name||!email||!pass){ if(resEl) resEl.textContent='Fill all'; return; }
   if(resEl) resEl.textContent='Saving...';
-  fetch('/api/portal/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',email:email,password:pass,role:role,name:name,phone:phone,created_by:currentUser?currentUser.email:''})}).then(function(r){return r.json();}).then(function(d){ if(resEl) resEl.textContent=d.error?'Error: '+d.error:'Added '+name; loadUsers(); }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
+  fetch('/api/portal/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_slug:'sobukhazi-high-school',email:email,password:pass,role:role,name:name,phone:phone,created_by:currentUser?currentUser.email:''})}).then(function(r){return r.json();}).then(function(d){ if(resEl) resEl.textContent=d.error?'Error: '+d.error:'Added '+name+' (password private)'; loadUsers(); }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
 }
 function markLate(){
   var stu=(document.getElementById('lStu')||{}).value||'';
@@ -552,34 +495,29 @@ function markLate(){
   var det=(document.getElementById('lDet')||{}).value||'';
   var resEl=document.getElementById('lRes');
   if(resEl) resEl.textContent='Saving...';
-  fetch('/api/attendance/late',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name:stu,class_name:'5B',arrival_time:time,reason:reason,reason_details:det,marked_by_name:currentUser?currentUser.name:''})}).then(function(r){return r.text();}).then(function(t){ if(resEl) resEl.textContent='Saved'; loadLates(); }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
+  fetch('/api/attendance/late',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name:stu,class_name:'5B',arrival_time:time,reason:reason,reason_details:det,marked_by_name:currentUser?currentUser.name:''})}).then(function(r){return r.text();}).then(function(){ if(resEl) resEl.textContent='Saved'; loadLates(); }).catch(function(e){ if(resEl) resEl.textContent='Error: '+e.message; });
 }
 function loadLates(){
   fetch('/api/attendance/late?limit=10').then(function(r){return r.json();}).then(function(data){
-    var html=''; if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var l=data[i]; html+='<div class="item"><b>'+l.student_name+'</b> '+l.date+' '+(l.arrival_time||'').slice(0,5)+' '+l.reason+'</div>'; } }
+    var html=''; if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var l=data[i]; html+='<div class="item"><b>'+l.student_name+'</b> '+(l.arrival_time||'').slice(0,5)+' '+l.reason+'</div>'; } }
     var el=document.getElementById('lList'); if(el) el.innerHTML=html||'No lates';
   });
 }
 function loadNotifs(){
-  var url='/api/notifications?limit=20';
-  if(currentRole==='parent' && currentUser && currentUser.email){
-    // Parent sees notifications for their child only — filter via students
-    fetch('/api/students?project_slug=sobukhazi-high-school&parent_email='+encodeURIComponent(currentUser.email)+'&limit=5').then(function(r){return r.json();}).then(function(students){
+  var email=currentUser?currentUser.email:'';
+  if(currentRole==='parent' && email){
+    fetch('/api/students?project_slug=sobukhazi-high-school&parent_email='+encodeURIComponent(email)+'&limit=5').then(function(r){return r.json();}).then(function(students){
       if(students && students.length>0){
-        var name=students[0].name;
-        fetch('/api/notifications?student='+encodeURIComponent(name)+'&limit=20').then(function(r){return r.json();}).then(function(data){
-          var html=''; if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var n=data[i]; html+='<div class="card" style="padding:10px"><b style="font-size:12px">'+n.title+'</b><div style="font-size:11px">'+n.message.slice(0,150)+'</div><div style="font-size:10px;color:#78716C">'+new Date(n.sent_at).toLocaleString()+'</div></div>'; } }
+        fetch('/api/notifications?student='+encodeURIComponent(students[0].name)+'&limit=20').then(function(r){return r.json();}).then(function(data){
+          var html=''; if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var n=data[i]; html+='<div class="card" style="padding:10px"><b style="font-size:12px">'+n.title+'</b><div style="font-size:11px">'+n.message.slice(0,150)+'</div></div>'; } }
           var el=document.getElementById('pNotifs')||document.getElementById('nList'); if(el) el.innerHTML=html||'No notifications for your child';
         });
       }else{
-        fetch('/api/notifications?limit=20').then(function(r){return r.json();}).then(function(data){
-          var html=''; if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var n=data[i]; html+='<div class="card" style="padding:10px"><b style="font-size:12px">'+n.title+'</b><div style="font-size:11px">'+n.message.slice(0,120)+'</div></div>'; } }
-          var el=document.getElementById('pNotifs')||document.getElementById('nList'); if(el) el.innerHTML=html||'No notifications';
-        });
+        var el=document.getElementById('pNotifs')||document.getElementById('nList'); if(el) el.innerHTML='No child linked';
       }
     });
   }else{
-    fetch(url).then(function(r){return r.json();}).then(function(data){
+    fetch('/api/notifications?limit=20').then(function(r){return r.json();}).then(function(data){
       var html=''; if(Array.isArray(data)){ for(var i=0;i<data.length;i++){ var n=data[i]; html+='<div class="card" style="padding:10px"><b style="font-size:12px">'+n.title+'</b><div style="font-size:11px">'+n.message.slice(0,120)+'</div></div>'; } }
       var el=document.getElementById('nList'); if(el) el.innerHTML=html||'No notifications';
     });
@@ -592,17 +530,15 @@ function loadChildData(){
     var infoEl=document.getElementById('childInfo');
     if(students && students.length>0){
       var s=students[0];
-      infoEl.innerHTML='<b>'+s.name+' • '+s.class_name+'</b> • Enroll '+(s.enrollment_no||'')+'<br><span style="font-size:12px;color:#78716C">Parent: '+(s.parent_name||'')+' • '+(s.parent_phone||'')+'<br>Private: Only you see this child (matched by '+email+')</span>';
-      loadResults();
-      loadNotifs();
+      infoEl.innerHTML='<b>'+s.name+' • '+s.class_name+'</b> • Enroll '+(s.enrollment_no||'')+'<br><span style="font-size:12px;color:#78716C">Private: Only you see this child</span>';
+      loadResults(); loadNotifs();
     }else{
-      infoEl.innerHTML='<b>No student linked to '+email+'</b><br><span style="font-size:12px;color:#78716C">Teacher must add student with parent_email = '+email+' — then you will see ONLY your child. Production privacy.</span>';
+      infoEl.innerHTML='<b>No student linked to '+email+'</b><br><span style="font-size:12px;color:#78716C">Teacher must add student with parent_email = '+email+'</span>';
       document.getElementById('childResults').innerHTML='<div class="card">No child linked</div>';
-      document.getElementById('pNotifs').innerHTML='<div class="card">No notifications</div>';
     }
   });
 }
-window.onerror=function(m,url,line,col){ var e=document.getElementById('err'); if(e){ e.style.display='block'; e.textContent='Error: '+m+' @ '+line; } return false; };
+window.onerror=function(m,url,line){ var e=document.getElementById('err'); if(e){ e.style.display='block'; e.textContent='Error: '+m+' @ '+line; } return false; };
 document.addEventListener('DOMContentLoaded', function(){
   var e=document.getElementById('email'); var p=document.getElementById('pass');
   if(e) e.addEventListener('keydown', function(ev){ if(ev.key==='Enter') login(); });
