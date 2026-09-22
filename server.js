@@ -107,6 +107,81 @@ app.get('/api/notifications', async (req, res) => {
   res.json(data);
 });
 
+// ANNOUNCEMENTS — Admin posts, appears on website
+app.get('/api/announcements', async (req, res) => {
+  const { project_slug, limit = 20 } = req.query;
+  let q = supabase.from('announcements').select('*').order('created_at', { ascending: false }).limit(parseInt(limit));
+  if (project_slug) q = q.eq('project_slug', project_slug);
+  const { data, error } = await q;
+  if (error) return res.status(400).json({ error: error.message, fallback: true });
+  res.json(data);
+});
+
+app.post('/api/announcements', async (req, res) => {
+  const { title, content, category, image_url, author_name, author_email, project_slug } = req.body;
+  if (!title || !content) return res.status(400).json({ error: 'title and content required' });
+  const { data, error } = await supabase.from('announcements').insert({
+    title, content, category: category || 'GENERAL', image_url,
+    author_name: author_name || 'Admin', author_email,
+    project_slug: project_slug || 'sobukhazi-high-school'
+  }).select().single();
+  if (error) return res.status(400).json({ error: error.message });
+  // Also save as memory for website to pick up
+  await addMemory({
+    agent_name: 'admin',
+    memory_type: 'announcement',
+    title: `${category || 'GENERAL'}: ${title}`,
+    content: content + (image_url ? ` Image:${image_url}` : ''),
+    metadata: { project_slug: project_slug || 'sobukhazi-high-school', category, image_url, author: author_name }
+  });
+  res.json(data);
+});
+
+// PORTAL USERS — Maintainer, Admin, Teacher, Parent credentials
+app.get('/api/portal/users', async (req, res) => {
+  const { project_slug, role, limit = 100 } = req.query;
+  let q = supabase.from('portal_users').select('*').order('created_at', { ascending: false }).limit(parseInt(limit));
+  if (project_slug) q = q.eq('project_slug', project_slug);
+  if (role) q = q.eq('role', role);
+  const { data, error } = await q;
+  if (error) return res.status(400).json({ error: error.message });
+  res.json(data);
+});
+
+app.post('/api/portal/users', async (req, res) => {
+  const { email, password, role, name, phone, student_name, class_name, project_slug, created_by } = req.body;
+  if (!email || !password || !role || !name) return res.status(400).json({ error: 'email, password, role, name required' });
+  const { data, error } = await supabase.from('portal_users').upsert({
+    project_slug: project_slug || 'sobukhazi-high-school',
+    email: email.toLowerCase(),
+    password_plain: password,
+    role,
+    name,
+    phone,
+    student_name,
+    class_name,
+    created_by: created_by || 'system'
+  }, { onConflict: 'project_slug,email' }).select().single();
+  if (error) return res.status(400).json({ error: error.message });
+  await addMemory({
+    agent_name: 'admin',
+    memory_type: 'user_added',
+    title: `User added: ${name} ${role}`,
+    content: `Email ${email} Role ${role} Added by ${created_by || 'system'}`,
+    metadata: { project_slug: project_slug || 'sobukhazi-high-school', role, email }
+  });
+  res.json(data);
+});
+
+app.post('/api/portal/login', async (req, res) => {
+  const { email, password, project_slug } = req.body;
+  if (!email || !password) return res.status(400).json({ error: 'email and password required' });
+  const { data, error } = await supabase.from('portal_users').select('*').eq('email', email.toLowerCase()).eq('project_slug', project_slug || 'sobukhazi-high-school').single();
+  if (error || !data) return res.status(401).json({ error: 'Invalid credentials', fallback: true });
+  if (data.password_plain !== password) return res.status(401).json({ error: 'Invalid password' });
+  res.json({ success: true, user: { id: data.id, email: data.email, role: data.role, name: data.name, project_slug: data.project_slug } });
+});
+
 // Memories / Second Brain (PERSISTENT)
 app.get('/api/memories', async (req, res) => {
   const { q, agent, project, limit } = req.query;
